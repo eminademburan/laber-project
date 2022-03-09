@@ -13,11 +13,15 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const styles = StyleSheet.create({
+  container:{
+    flex:1,
+  },
   header: {
     backgroundColor: '#32a8a8',
+    flex:0.4,
   },
   headerContent: {
-    padding: 30,
+    padding: 10,
     alignItems: 'center',
   },
   avatar: {
@@ -40,6 +44,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     position: 'absolute',
     backgroundColor: '#ffffff',
+    flex: 0.2,
   },
   detailContent: {
     margin: 10,
@@ -51,6 +56,9 @@ const styles = StyleSheet.create({
   },
   count: {
     fontSize: 18,
+  },
+  body:{
+    flex:0.4,
   },
   bodyContent: {
     flex: 1,
@@ -120,11 +128,12 @@ class Profile extends React.Component {
   };
 
   handleLogout = async () => {
-    const {navigate} = this.props.navigation;
+
 
     try {
       await AsyncStorage.removeItem('user');
       await AsyncStorage.removeItem('password');
+      this.props.navigation.navigate('Home');
     } catch (exception) {
       return false;
     }
@@ -157,7 +166,7 @@ class Profile extends React.Component {
           </View>
         </View>
 
-        <View style={{alignItems: 'center', paddingTop: 50}}>
+        {/*<View style={{alignItems: 'center', paddingTop: 50}}>
           <Stars
             rating={3.4}
             count={5}
@@ -171,7 +180,7 @@ class Profile extends React.Component {
             }
             halfStar={<Icon name={'star-half'} style={[styles.myStarStyle]} />}
           />
-        </View>
+        </View>*/}
 
         <View style={styles.body}>
           <View style={styles.bodyContent}>

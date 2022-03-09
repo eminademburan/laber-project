@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Text, View, StyleSheet, Image, TextInput, Button, TouchableOpacity } from 'react-native';
 import Stars from 'react-native-stars';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const styles = StyleSheet.create({
     header:{
@@ -86,52 +86,7 @@ const styles = StyleSheet.create({
 class Settings extends React.Component{
 
     render() {
-        return (
-            <View style={styles.container}>
-                <View style={styles.header}>
-                    <View style={styles.headerContent}>
-                        <Image style={styles.avatar} source={{uri: 'https://bootdey.com/img/Content/avatar/avatar2.png'}}/>
-                        <Text style={styles.name}>
-
-                        </Text>
-                    </View>
-                </View>
-
-                <View style={styles.profileDetail}>
-                    <View style={styles.detailContent}>
-                        <Text style={styles.title}>Photos {'\u0024'}</Text>
-                    </View>
-                    <View style={styles.detailContent}>
-                        <Text style={styles.title}>Followers {'\u20BF'}</Text>
-
-                    </View>
-                    <View style={styles.detailContent}>
-                        <Text style={styles.title}>Score: 54.7</Text>
-                    </View>
-                </View>
-
-                <View style={{alignItems:'center', paddingTop: 50}}>
-                    <Stars
-                        rating={3.4}
-                        count={5}
-                        half={true}
-                        fullStar={<Icon name={'star'} style={[styles.myStarStyle]}/>}
-                        emptyStar={<Icon name={'star-outline'} style={[styles.myStarStyle, styles.myEmptyStarStyle]}/>}
-                        halfStar={<Icon name={'star-half'} style={[styles.myStarStyle]}/>}
-                    />
-                </View>
-
-                <View style={styles.body}>
-                    <View style={styles.bodyContent}>
-                        <TouchableOpacity style={styles.buttonContainer}>
-                            <Text>Friends</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.buttonContainer}>
-                            <Text>Friend Requests</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </View>
+        return ( <View></View>
         );
     }
 
