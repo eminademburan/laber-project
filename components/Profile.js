@@ -116,10 +116,12 @@ class Profile extends React.Component {
 
   readStore = async () => {
     try {
-      const value = await AsyncStorage.getItem('user');
-
-
-      if (value !== null) {
+      const value = await AsyncStorage.getItem('username');
+      if( value == null)
+      {
+        this.readStore();
+      }
+      else if (value !== null) {
         this.setState({username: value});
       }
     } catch (e) {
@@ -131,8 +133,9 @@ class Profile extends React.Component {
 
 
     try {
-      await AsyncStorage.removeItem('user');
+      await AsyncStorage.removeItem('mail');
       await AsyncStorage.removeItem('password');
+      await AsyncStorage.removeItem('username');
       this.props.navigation.navigate('Home');
     } catch (exception) {
       return false;

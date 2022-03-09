@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Text, View, StyleSheet, Image, TextInput, Button } from 'react-native';
+import axios from "axios";
 
 const styles = StyleSheet.create({
     container: {
@@ -48,6 +49,77 @@ const styles = StyleSheet.create({
 
 class SignUp extends React.Component{
 
+    state =
+        {
+            name: "",
+            surname: "",
+            phone: "",
+            email: "",
+            age:"",
+            region:"",
+            language:"",
+            password:"",
+            link:"",
+        };
+
+    constructor(props) {
+        super(props);
+
+    }
+
+    handleEmail1 = text => {
+        this.setState({email: text});
+    };
+
+    handlePassword1 = text => {
+        this.setState({password: text});
+    };
+
+    handleName = text => {
+        this.setState({name: text});
+    };
+
+    handleSurname = text => {
+        this.setState({surname: text});
+    };
+
+    handlePhone = text => {
+        this.setState({phone: text});
+    };
+
+    handleAge = text => {
+        this.setState({age: text});
+    };
+
+    handleRegion = text => {
+        this.setState({region: text});
+    };
+
+    handleLanguage = text => {
+        this.setState({language: text});
+    };
+
+    handleLink = text => {
+        this.setState({link: text});
+    };
+
+    handleSignup = () => {
+        axios.get('http://10.0.2.2:5000/add_user/' + this.state.email + "/" + this.state.name + "/"+ this.state.surname +"/"+this.state.phone+"/"+
+            this.state.age+"/"+this.state.region+"/"+this.state.language+"/"+this.state.password+"/"+this.state.link).then(response => {
+
+            if( response.data.message == "success")
+            {
+                alert("your account has been created");
+                this.props.navigation.navigate('Home');
+            }
+            else if( response.data.message == "failed") {
+                alert("your account could not be created");
+                this.props.navigation.navigate('SignUp');
+            }
+        });
+
+    };
+
     render( ){
         return(
 
@@ -59,6 +131,7 @@ class SignUp extends React.Component{
                             style={styles.TextInput}
                             placeholder="Name"
                             placeholderTextColor="#003f5c"
+                            onChangeText={this.handleName}
                         />
                     </View>
                     <View style = {styles.inputView2}>
@@ -66,6 +139,7 @@ class SignUp extends React.Component{
                             style={styles.TextInput}
                             placeholder="Surname"
                             placeholderTextColor="#003f5c"
+                            onChangeText={this.handleSurname}
                         />
                     </View>
                 </View>
@@ -75,6 +149,7 @@ class SignUp extends React.Component{
                         style={styles.TextInput}
                         placeholder="Phone"
                         placeholderTextColor="#003f5c"
+                        onChangeText={this.handlePhone}
                     />
                 </View>
 
@@ -84,6 +159,7 @@ class SignUp extends React.Component{
                         placeholder="Email address"
                         placeholderTextColor="#003f5c"
                         keyboardType={'email-address'}
+                        onChangeText={this.handleEmail1}
                     />
                 </View>
 
@@ -93,6 +169,7 @@ class SignUp extends React.Component{
                             style={styles.TextInput}
                             placeholder="Age"
                             placeholderTextColor="#003f5c"
+                            onChangeText={this.handleAge}
                         />
                     </View>
                     <View style = {styles.inputView2}>
@@ -100,6 +177,7 @@ class SignUp extends React.Component{
                             style={styles.TextInput}
                             placeholder="Region"
                             placeholderTextColor="#003f5c"
+                            onChangeText={this.handleRegion}
                         />
                     </View>
                 </View>
@@ -109,6 +187,7 @@ class SignUp extends React.Component{
                         style={styles.TextInput}
                         placeholder="Language"
                         placeholderTextColor="#003f5c"
+                        onChangeText={this.handleLanguage}
                     />
                 </View>
 
@@ -118,6 +197,7 @@ class SignUp extends React.Component{
                         placeholder="Password"
                         placeholderTextColor="#003f5c"
                         secureTextEntry={true}
+                        onChangeText={this.handlePassword1}
                     />
                 </View>
 
@@ -126,13 +206,14 @@ class SignUp extends React.Component{
                         style={styles.TextInput}
                         placeholder="Invitation Link"
                         placeholderTextColor="#003f5c"
+                        onChangeText={this.handleLink}
                     />
                 </View>
 
 
 
                 <View style = {styles.loginBtn}>
-                    <Button title = "Sing In" onPress={() => this.props.navigation.goBack()}  />
+                    <Button title = "Sing In" onPress={ this.handleSignup}  />
                 </View>
             </View>
 

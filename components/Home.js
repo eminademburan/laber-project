@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from "axios";
 
 const styles = StyleSheet.create({
   container: {
@@ -52,6 +53,7 @@ class Home extends React.Component {
   state = {
     email: '',
     password: '',
+    name: '',
   };
 
   constructor() {
@@ -67,23 +69,34 @@ class Home extends React.Component {
   };
 
   handleLogin = () => {
+    axios.get('http://10.0.2.2:5000/get_user/' + this.state.email).then(response => {
 
 
+      if( response.data == null)
+      {
+        alert("email or password is wrong ");
+      }
+      else if( this.state.password == response.data.password) {
+        this.setState({name: response.data.name});
 
-    if (this.state.email == 'Admin' && this.state.password == 'Admin') {
-      this.storeData();
-      this.props.navigation.navigate('MyTabs');
-    }
+        this.storeData();
+        this.props.navigation.navigate('MyTabs');
+
+      }
+    });
+
   };
 
   storeData = async () => {
-    const user = this.state.email;
+    const mail = this.state.email;
     const password1 = this.state.password;
+    const username1 = this.state.name;
 
     try {
 
-      await AsyncStorage.setItem('user', user);
+      await AsyncStorage.setItem('mail', mail);
       await AsyncStorage.setItem('password', password1);
+      await AsyncStorage.setItem('username', username1);
 
     } catch (e) {
       // saving error
@@ -96,9 +109,13 @@ class Home extends React.Component {
 
   readStore = async () => {
     try {
-      const value1 = await AsyncStorage.getItem('user');
+      const value1 = await AsyncStorage.getItem('mail');
       const value2 = await AsyncStorage.getItem('password');
 
+      if( value1 == null || value2 == null)
+      {
+        this.readStore();
+      }
 
       if (value1 !== null && value2 !== null) {
         this.setState({email: value1});
