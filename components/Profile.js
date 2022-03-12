@@ -11,6 +11,7 @@ import {
 import Stars from 'react-native-stars';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from "axios";
 
 const styles = StyleSheet.create({
   container:{
@@ -102,6 +103,7 @@ const styles = StyleSheet.create({
 
 class Profile extends React.Component {
   state = {
+    mail: '',
     username: '',
   };
 
@@ -116,18 +118,35 @@ class Profile extends React.Component {
 
   readStore = async () => {
     try {
-      const value = await AsyncStorage.getItem('username');
+      const value = await AsyncStorage.getItem('mail');
       if( value == null)
       {
         this.readStore();
       }
       else if (value !== null) {
-        this.setState({username: value});
+        this.setState({mail: value});
+        this.findUserName();
       }
     } catch (e) {
       // error reading value
     }
   };
+
+  findUserName()
+  {
+      axios.get('http://10.0.2.2:5000/get_user/' + this.state.mail).then(response => {
+
+
+      if( response.data == null)
+      {
+        alert("email or password is wrong ");
+      }
+      else
+      {
+        this.setState({username: response.data.name});
+      }
+    });
+  }
 
   handleLogout = async () => {
 

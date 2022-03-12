@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { Text, View, StyleSheet, Image, TextInput, Button } from 'react-native';
+import {Text, View, StyleSheet, Image, TextInput, Button, TouchableOpacity} from 'react-native';
 import axios from "axios";
+import CountryPicker from 'react-native-country-picker-modal';
 
 const styles = StyleSheet.create({
     container: {
@@ -30,7 +31,6 @@ const styles = StyleSheet.create({
         width: "70%",
         height: 45,
         marginBottom: 20,
-
         alignItems: "center",
     },
     inputView2: {
@@ -56,15 +56,18 @@ class SignUp extends React.Component{
             phone: "",
             email: "",
             age:"",
-            region:"",
             language:"",
             password:"",
             link:"",
+            region: 'US',
+
         };
 
     constructor(props) {
         super(props);
-
+        this.state = {
+            region: 'US'
+        };
     }
 
     handleEmail1 = text => {
@@ -91,9 +94,7 @@ class SignUp extends React.Component{
         this.setState({age: text});
     };
 
-    handleRegion = text => {
-        this.setState({region: text});
-    };
+
 
     handleLanguage = text => {
         this.setState({language: text});
@@ -102,6 +103,7 @@ class SignUp extends React.Component{
     handleLink = text => {
         this.setState({link: text});
     };
+
 
     handleSignup = () => {
         axios.get('http://10.0.2.2:5000/add_user/' + this.state.email + "/" + this.state.name + "/"+ this.state.surname +"/"+this.state.phone+"/"+
@@ -163,25 +165,23 @@ class SignUp extends React.Component{
                     />
                 </View>
 
-                <View style = {styles.row}>
-                    <View style = {styles.inputView2}>
-                        <TextInput
-                            style={styles.TextInput}
-                            placeholder="Age"
-                            placeholderTextColor="#003f5c"
-                            onChangeText={this.handleAge}
-                        />
-                    </View>
-                    <View style = {styles.inputView2}>
-                        <TextInput
-                            style={styles.TextInput}
-                            placeholder="Region"
-                            placeholderTextColor="#003f5c"
-                            onChangeText={this.handleRegion}
-                        />
-                    </View>
+
+                <View style = {styles.inputView2}>
+                    <TextInput
+                        style={styles.TextInput}
+                        placeholder="Age"
+                        placeholderTextColor="#003f5c"
+                        onChangeText={this.handleAge}
+                    />
                 </View>
 
+
+                <CountryPicker
+                    onSelect={(value)=> this.setState({country: value, region: value.cca2})}
+                    cca2={this.state.region}
+                    translation='eng'
+                />
+                
                 <View style = {styles.inputView}>
                     <TextInput
                         style={styles.TextInput}
@@ -210,11 +210,10 @@ class SignUp extends React.Component{
                     />
                 </View>
 
+                <TouchableOpacity style={styles.loginBtn} onPress={this.handleSignup }>
+                    <Text>Sign In</Text>
+                </TouchableOpacity>
 
-
-                <View style = {styles.loginBtn}>
-                    <Button title = "Sing In" onPress={ this.handleSignup}  />
-                </View>
             </View>
 
         )

@@ -10,24 +10,23 @@ import {
   CheckBox,
   Component,
 } from 'react-native';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {RadioButton, Text} from 'react-native-paper';
 import {Image} from 'react-native';
 import Slider from '@react-native-community/slider';
+import {Picker} from '@react-native-picker/picker';
+import { FrownOutlined, SmileOutlined } from '@ant-design/icons';
 
 import axios from 'axios';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
     flex: 1,
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center"
   },
   TextInput: {
-    flex: 0.1,
+    flex: 0.2,
     padding: 10,
   },
   stretch: {
@@ -41,12 +40,10 @@ const styles = StyleSheet.create({
   },
   loginBtn: {
     flex: 0.5,
-    width: '50%',
     borderRadius: 25,
-    height: 50,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 20,
+    marginTop: 100,
     marginBottom: 20,
     marginLeft: 20,
     marginRight: 20,
@@ -64,7 +61,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     alignItems: 'center',
   },
-
   nextButtonLeft: {
     flex: 0.3,
     width: '50%',
@@ -78,7 +74,6 @@ const styles = StyleSheet.create({
     marginRight: 50,
     backgroundColor: '#fc8403',
   },
-
   nextButtonRight: {
     flex: 0.3,
     width: '50%',
@@ -92,29 +87,101 @@ const styles = StyleSheet.create({
     marginRight: 10,
     backgroundColor: '#fc8403',
   },
-
   forgot_button: {
+    marginBottom: 20,
+  },
+  textCenter:{
+    flex: 0.4,
+    justifyContent: 'center'
+  },
+  checkboxContainer: {
+    flexDirection: "row",
     marginBottom: 20,
   },
 });
 
 class Tasks extends React.Component {
   state = {
-    myState: '1',
-    data: null,
-    data2: null,
+    myState: '0',
+    sarcasm: "serious",
+    sentiment: 0,
+    tweetText: 0,
+    mail:"",
+    tweet_id: 0,
   };
 
   constructor(props: Props) {
     super(props);
+  }
 
-    console.log('i am hear');
-    axios.get('http://10.0.2.2:5000/get_todo/1').then(response => {
-      this.setState({data2: response.data.title});
-      this.setState({myState: '1'});
-      console.log('i am in');
+  componentDidMount() {
+    this.readStore();
+  }
+
+  getTweetFromQueue= () =>
+  {
+
+    axios.get('http://10.0.2.2:5000/get_tweet_to_answer/' + this.state.mail).then(response => {
+
+
+      if( response.data == null)
+      {
+        this.setState({myState : '0'});
+        alert("There is no task in the queue");
+      }
+      else{
+
+        this.setState({tweet_id : response.data.tweet_id});
+        axios.get('http://10.0.2.2:5000/get_tweet' + "/" +this.state.tweet_id).then(response => {
+
+
+          if( response.data == null)
+          {
+            this.setState({myState : '0'});
+
+          }
+          else{
+            const value = response.data.text;
+            this.setState({tweetText : value});
+            this.setState({myState : '1'});
+          }
+        });
+      }
+    });
+
+
+  }
+
+  answerQuestion= () =>
+  {
+    axios.get('http://10.0.2.2:5000/add_response/' + this.state.tweet_id +"/" + this.state.mail + "/" + this.state.sentiment +"/"+this.state.sarcasm).then(response => {
+
+
+      if( response.data.message == "failed")
+      {
+        this.setState({myState : '0'});
+      }
+      else{
+        this.getTweetFromQueue();
+      }
     });
   }
+
+  readStore = async () => {
+    try {
+      const value = await AsyncStorage.getItem('mail');
+      if( value == null)
+      {
+        this.readStore();
+      }
+      else if (value !== null) {
+        this.setState({mail: value});
+        this.getTweetFromQueue();
+      }
+    } catch (e) {
+      // error reading value
+    }
+  };
 
   stateChange = () => {
     if (this.state.myState == '1') {
@@ -124,46 +191,57 @@ class Tasks extends React.Component {
     }
   };
 
+  setSarcasm  (text) {
+    this.setState({sarcasm: text});
+  };
+
+
   render() {
-    if (this.state.myState == '1') {
+
+    if( this.state.myState =='0')
+    {
+      return(
+          <View style={styles.container}>
+            <Text style ={styles.textCenter}>Press the button to get task</Text>
+            <TouchableOpacity style={styles.loginBtn} onPress={this.getTweetFromQueue}>
+              <Text>Get Task</Text>
+            </TouchableOpacity>
+          </View>
+      );
+    }
+    else if (this.state.myState == '1') {
       return (
         <View style={styles.container}>
           <View style={styles.bos} />
-          <Image
-            style={styles.stretch}
-            source={require('../assets/twit1.png')}
-          />
+          <Text style={styles.textCenter} adjustsFontSizeToFit numberOfLines={5}>
+            {this.state.tweetText}
+          </Text>
           <Text style={styles.TextInput}>
-            {' '}
-            This is the {this.state.data2} . question with options and it is{' '}
+            Determine the sarcasm type of this tweet.  {this.state.tweet_id}
           </Text>
 
           <View style={styles.aralik}>
-            <View style={styles.loginBtn}>
-              <Button title="A" onPress={this.stateChange} />
-            </View>
-            <View style={styles.loginBtn}>
-              <Button title="B" onPress={this.stateChange} />
-            </View>
+            <Picker
+                selectedValue={this.state.sarcasm}
+                onValueChange={(itemValue, itemIndex) =>
+                    this.setSarcasm(itemValue)
+                }
+                style={{  height: 50, width: 225 }}
+            >
+              <Picker.Item label="Serious" value="serious" />
+              <Picker.Item label="Sarcastic" value="sarcastic" />
+              <Picker.Item label="Mixed" value="mixed" />
+            </Picker>
           </View>
 
           <View style={styles.aralik}>
-            <View style={styles.loginBtn}>
-              <Button title="C" onPress={this.stateChange} />
-            </View>
-            <View style={styles.loginBtn}>
-              <Button title="D" onPress={this.stateChange} />
-            </View>
-          </View>
-
-          <View style={styles.aralik}>
-            <View style={styles.nextButtonLeft}>
-              <Button title="Previous" onPress={this.stateChange} />
-            </View>
+            <TouchableOpacity style={styles.nextButtonLeft} onPress={this.stateChange}>
+              <Text>Previous</Text>
+            </TouchableOpacity>
             <View style={styles.bos} />
-            <View style={styles.nextButtonRight}>
-              <Button title="Next" onPress={this.stateChange} />
-            </View>
+            <TouchableOpacity style={styles.nextButtonRight} onPress={this.stateChange} >
+              <Text>Next</Text>
+            </TouchableOpacity>
           </View>
 
           <View style={styles.bos} />
@@ -173,33 +251,37 @@ class Tasks extends React.Component {
       return (
         <View style={styles.container}>
           <View style={styles.bos} />
-          <Image
-            style={styles.stretch}
-            source={require('../assets/twit1.png')}
-          />
+          <Text style={styles.textCenter} adjustsFontSizeToFit numberOfLines={5}>
+            {this.state.tweetText}
+          </Text>
           <Text style={styles.TextInput}>
-            {' '}
-            This is the question with options and it is{' '}
+            Determine the sentiment of this tweet from 1 to 10  {this.state.tweet_id}
           </Text>
 
           <View style={{flex: 0.2, flexDirection: 'row'}}>
+
+            <Text style={styles.title}>☹️</Text>
             <Slider
-              style={{width: 200, height: 40}}
-              minimumValue={0}
-              maximumValue={1}
-              minimumTrackTintColor="#FFFFFF"
-              maximumTrackTintColor="#000000"
+                style={{width: 200, height: 40}}
+                minimumValue={0}
+                maximumValue={10}
+                step={1}
+                minimumTrackTintColor="#FFFFFF"
+                maximumTrackTintColor="#000000"
+                onValueChange={(someValue) => this.setState({sentiment: someValue})}
             />
+            <Text style={styles.title}>☺️</Text>
+
           </View>
 
           <View style={styles.aralik}>
-            <View style={styles.nextButtonLeft}>
-              <Button title="Previous" onPress={this.stateChange} />
-            </View>
+            <TouchableOpacity style={styles.nextButtonLeft} onPress={this.stateChange}>
+              <Text>Previous</Text>
+            </TouchableOpacity>
             <View style={styles.bos} />
-            <View style={styles.nextButtonRight}>
-              <Button title="Next" onPress={this.stateChange} />
-            </View>
+            <TouchableOpacity style={styles.nextButtonRight} onPress={this.answerQuestion }>
+              <Text>Submit</Text>
+            </TouchableOpacity>
           </View>
 
           <View style={styles.bos} />

@@ -58,6 +58,7 @@ class Home extends React.Component {
 
   constructor() {
     super();
+
   }
 
   handleEmail = text => {
@@ -69,6 +70,7 @@ class Home extends React.Component {
   };
 
   handleLogin = () => {
+
     axios.get('http://10.0.2.2:5000/get_user/' + this.state.email).then(response => {
 
 
@@ -76,12 +78,11 @@ class Home extends React.Component {
       {
         alert("email or password is wrong ");
       }
-      else if( this.state.password == response.data.password) {
+      else if( this.state.password == response.data.password)
+      {
         this.setState({name: response.data.name});
-
         this.storeData();
         this.props.navigation.navigate('MyTabs');
-
       }
     });
 
@@ -92,14 +93,16 @@ class Home extends React.Component {
     const password1 = this.state.password;
     const username1 = this.state.name;
 
+
     try {
 
       await AsyncStorage.setItem('mail', mail);
       await AsyncStorage.setItem('password', password1);
-      await AsyncStorage.setItem('username', username1);
+
+
 
     } catch (e) {
-      // saving error
+
     }
   };
 
