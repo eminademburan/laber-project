@@ -7,9 +7,15 @@ import {
   TextInput,
   Button,
   TouchableOpacity,
+  Dimensions
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from "axios";
+import axios from 'axios';
+import {WebView} from 'react-native-webview';
+
+const windowWidth = Dimensions.get('screen').width;
+const windowHeight = Dimensions.get('screen').height;
+
 
 const styles = StyleSheet.create({
   container: {
@@ -17,6 +23,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  container2: {
+    flex: 0.5,
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    marginTop: windowHeight/5,
   },
   TextInput: {
     height: 50,
@@ -58,7 +70,6 @@ class Home extends React.Component {
 
   constructor() {
     super();
-
   }
 
   handleEmail = text => {
@@ -70,22 +81,19 @@ class Home extends React.Component {
   };
 
   handleLogin = () => {
-
-    axios.get('http://10.0.2.2:5000/get_user/' + this.state.email).then(response => {
-
-
-      if( response.data == null)
-      {
-        alert("email or password is wrong ");
-      }
-      else if( this.state.password == response.data.password)
-      {
-        this.setState({name: response.data.name});
-        this.storeData();
-        this.props.navigation.navigate('MyTabs');
-      }
-    });
-
+    axios.post('http://10.0.2.2:5000/get_user',{email: this.state.email})
+        .then(response => {
+              if (response.data == null) {
+                alert('email or password is wrong ');
+              }
+              else if (this.state.password == response.data.password)
+              {
+                this.setState({name: response.data.name});
+                this.storeData();
+                this.props.navigation.navigate('MyTabs');
+              }
+            }
+        );
   };
 
   storeData = async () => {
@@ -93,17 +101,10 @@ class Home extends React.Component {
     const password1 = this.state.password;
     const username1 = this.state.name;
 
-
     try {
-
       await AsyncStorage.setItem('mail', mail);
       await AsyncStorage.setItem('password', password1);
-
-
-
-    } catch (e) {
-
-    }
+    } catch (e) {}
   };
 
   componentDidMount() {
@@ -115,8 +116,7 @@ class Home extends React.Component {
       const value1 = await AsyncStorage.getItem('mail');
       const value2 = await AsyncStorage.getItem('password');
 
-      if( value1 == null || value2 == null)
-      {
+      if (value1 == null || value2 == null) {
         this.readStore();
       }
 
@@ -133,6 +133,7 @@ class Home extends React.Component {
   render() {
     return (
       <View style={styles.container}>
+
         <View style={styles.inputView}>
           <TextInput
             style={styles.TextInput}

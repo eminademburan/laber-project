@@ -11,15 +11,15 @@ import {
 import Stars from 'react-native-stars';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from "axios";
+import axios from 'axios';
 
 const styles = StyleSheet.create({
-  container:{
-    flex:1,
+  container: {
+    flex: 1,
   },
   header: {
     backgroundColor: '#32a8a8',
-    flex:0.4,
+    flex: 0.4,
   },
   headerContent: {
     padding: 10,
@@ -58,8 +58,8 @@ const styles = StyleSheet.create({
   count: {
     fontSize: 18,
   },
-  body:{
-    flex:0.4,
+  body: {
+    flex: 0.4,
   },
   bodyContent: {
     flex: 1,
@@ -109,7 +109,6 @@ class Profile extends React.Component {
 
   constructor() {
     super();
-
   }
 
   componentDidMount() {
@@ -119,11 +118,9 @@ class Profile extends React.Component {
   readStore = async () => {
     try {
       const value = await AsyncStorage.getItem('mail');
-      if( value == null)
-      {
+      if (value == null) {
         this.readStore();
-      }
-      else if (value !== null) {
+      } else if (value !== null) {
         this.setState({mail: value});
         this.findUserName();
       }
@@ -132,25 +129,21 @@ class Profile extends React.Component {
     }
   };
 
-  findUserName()
-  {
-      axios.get('http://10.0.2.2:5000/get_user/' + this.state.mail).then(response => {
+  findUserName() {
 
 
-      if( response.data == null)
-      {
-        alert("email or password is wrong ");
-      }
-      else
-      {
-        this.setState({username: response.data.name});
-      }
-    });
+    axios
+      .get('http://10.0.2.2:5000/get_user/' + this.state.mail)
+      .then(response => {
+        if (response.data == null) {
+          alert('email or password is wrong ');
+        } else {
+          this.setState({username: response.data.name});
+        }
+      });
   }
 
   handleLogout = async () => {
-
-
     try {
       await AsyncStorage.removeItem('mail');
       await AsyncStorage.removeItem('password');
