@@ -130,10 +130,7 @@ class Profile extends React.Component {
   };
 
   findUserName() {
-
-
-    axios
-      .get('http://10.0.2.2:5000/get_user/' + this.state.mail)
+    axios.post('http://10.0.2.2:5000/get_user' , {email: this.state.mail})
       .then(response => {
         if (response.data == null) {
           alert('email or password is wrong ');

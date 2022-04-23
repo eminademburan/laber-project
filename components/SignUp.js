@@ -1,7 +1,9 @@
 import * as React from 'react';
-import {Text, View, StyleSheet, Image, TextInput, Button, TouchableOpacity} from 'react-native';
+import {Text, View, StyleSheet, Image, TextInput, Button, TouchableOpacity, PixelRatio, Dimensions} from 'react-native';
 import axios from "axios";
 import CountryPicker from 'react-native-country-picker-modal';
+
+const windowWidth = Dimensions.get('screen').width;
 
 const styles = StyleSheet.create({
     container: {
@@ -17,12 +19,13 @@ const styles = StyleSheet.create({
         marginLeft: 20,
     },
     loginBtn: {
-        width: "50%",
+        width: "35%",
         borderRadius: 25,
         height: 50,
         alignItems: "center",
         justifyContent: "center",
         marginTop: 40,
+        marginRight: 20,
         backgroundColor: "#32a8a8",
     },
     inputView: {
@@ -33,18 +36,43 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         alignItems: "center",
     },
+    inputViewForCountry: {
+        backgroundColor: "#d3e0e0",
+        borderRadius: 30,
+        width: windowWidth * (5/10),
+        height: 45,
+        marginBottom: 20,
+        alignItems: "center",
+    },
     inputView2: {
         backgroundColor: "#d3e0e0",
         borderRadius: 30,
         width: "35%",
         height: 45,
         marginBottom: 20,
-
         alignItems: "center",
     },
     row: {
         flexDirection: "row",
     },
+    picker: {
+        marginTop: 70,
+        marginBottom: 70,
+    },
+    instructions: {
+        fontSize: 12,
+        textAlign: 'center',
+        color: '#888',
+        marginBottom: 5,
+    },
+    data: {
+        backgroundColor: "#d3e0e0",
+        width: windowWidth * (2/5),
+        height: 45,
+        marginBottom: 20,
+        alignItems: "center",
+        textAlign: 'center',
+    }
 });
 
 class SignUp extends React.Component{
@@ -56,10 +84,11 @@ class SignUp extends React.Component{
             phone: "",
             email: "",
             age:"",
-            language:"",
             password:"",
             link:"",
             region: 'US',
+            countryName :"",
+            language:""
 
         };
 
@@ -75,6 +104,8 @@ class SignUp extends React.Component{
     };
 
     handlePassword1 = text => {
+        alert("* The password must contain at least 1 lowercase alphabetical character \n* The password must contain at least 1 uppercase alphabetical character \n* The password must contain at least 1 numeric character" +
+            "\n* The password must contain at least one special character \n* The password must be eight characters or longer");
         this.setState({password: text});
     };
 
@@ -95,34 +126,92 @@ class SignUp extends React.Component{
     };
 
 
-
-    handleLanguage = text => {
-        this.setState({language: text});
-    };
-
     handleLink = text => {
         this.setState({link: text});
     };
 
+    validateUserInfo= () => {
+        const emailRegex = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/;
+        const nameRegex = /[A-Z][a-zA-Z]*/;
+        const surnameRegex = /[A-Z][a-zA-Z]*/;
+        const phoneRegEx = /^\+[0-9]{2}[0-9]{10}$/;
+        const ageRegEx =  /^\d{1,2}$/;
+        const passwordRegEx = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/;
+        const linkRegEx = /[0-9][0-9][0-9][0-9][0-9][0-9]/;
+
+        if(emailRegex.test(this.state.email) && nameRegex.test(this.state.name) && surnameRegex.test(this.state.surname) && phoneRegEx.test(this.state.phone)
+            && ageRegEx.test(this.state.age) && passwordRegEx.test(this.state.password) && ( linkRegEx.test(this.state.link)  || this.state.link.length == 0))
+        {
+            return true;
+        }
+        else if( !nameRegex.test(this.state.name) )
+        {
+            alert("Enter an appropriate name");
+            return false;
+        }
+        else if( !surnameRegex.test(this.state.surname))
+        {
+            alert("Enter an appropriate surname");
+            return false;
+        }
+        else if( !phoneRegEx.test(this.state.phone))
+        {
+            alert("Enter an appropriate phone number");
+            return false;
+        }
+        else if( !emailRegex.test(this.state.email) ) {
+            alert("Enter an appropriate mail");
+            return false;
+        }
+        else if( !ageRegEx.test(this.state.age))
+        {
+            alert("Enter an appropriate age");
+            return false;
+        }
+        else if( !passwordRegEx.test(this.state.password))
+        {
+            alert("Enter an appropriate password");
+            return false;
+        }
+        else if( !linkRegEx.test(this.state.link) && !this.state.link.length == 0)
+        {
+            alert("Enter an appropriate link");
+            return false;
+        }
+        else{
+            return false;
+        }
+    }
+
 
     handleSignup = () => {
-        axios.get('http://10.0.2.2:5000/add_user/' + this.state.email + "/" + this.state.name + "/"+ this.state.surname +"/"+this.state.phone+"/"+
-            this.state.age+"/"+this.state.region+"/"+this.state.language+"/"+this.state.password+"/"+this.state.link).then(response => {
 
-            if( response.data.message == "success")
-            {
-                alert("your account has been created");
-                this.props.navigation.navigate('Home');
-            }
-            else if( response.data.message == "failed") {
-                alert("your account could not be created");
-                this.props.navigation.navigate('SignUp');
-            }
-        });
+        if( this.validateUserInfo()) {
+            axios.post('http://10.0.2.2:5000/add_user', {
+                email: this.state.email,
+                name: this.state.name,
+                surname: this.state.surname,
+                phone: this.state.phone,
+                age: this.state.age,
+                region: this.state.region,
+                language: this.state.language,
+                password: this.state.password,
+                link: this.state.link
+            }).then(response => {
+                        if (response.data.message == "success") {
+                            alert("your account has been created");
+                            this.props.navigation.navigate('Home');
+                        } else if (response.data.message == "failed") {
+                            alert("your account could not be created");
+                            this.props.navigation.navigate('SignUp');
+                        }
+                    }
+                );
+        }
 
     };
 
-    render( ){
+    render(){
         return(
 
             <View style={styles.container}>
@@ -175,21 +264,20 @@ class SignUp extends React.Component{
                     />
                 </View>
 
+                    <CountryPicker
+                        onSelect={(value)=> this.setState({country: value, region: value.cca2, countryName: value.name})}
+                        cca2={this.state.region}
+                        translation='eng'
+                        containerButtonStyle={ styles.inputViewForCountry}
+                        visible={this.state.visible}
 
-                <CountryPicker
-                    onSelect={(value)=> this.setState({country: value, region: value.cca2})}
-                    cca2={this.state.region}
-                    translation='eng'
-                />
-                
-                <View style = {styles.inputView}>
-                    <TextInput
-                        style={styles.TextInput}
-                        placeholder="Language"
-                        placeholderTextColor="#003f5c"
-                        onChangeText={this.handleLanguage}
                     />
-                </View>
+                    {this.state.country &&
+                        <Text  numberOfLines={2} style={styles.data}>
+                            {this.state.countryName}
+                        </Text>
+                    }
+
 
                 <View style = {styles.inputView}>
                     <TextInput
@@ -210,9 +298,16 @@ class SignUp extends React.Component{
                     />
                 </View>
 
-                <TouchableOpacity style={styles.loginBtn} onPress={this.handleSignup }>
-                    <Text>Sign In</Text>
-                </TouchableOpacity>
+                <View style={styles.row} >
+                    <TouchableOpacity style={styles.loginBtn} onPress={() => this.props.navigation.navigate('Home') }>
+                        <Text>Back</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.loginBtn} onPress={this.handleSignup }>
+                        <Text>Sign In</Text>
+                    </TouchableOpacity>
+
+                </View>
+
 
             </View>
 

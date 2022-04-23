@@ -153,9 +153,10 @@ class Home extends React.Component {
           />
         </View>
 
-        <View style={styles.loginBtn}>
-          <Button title="Login" onPress={this.handleLogin} />
-        </View>
+        <TouchableOpacity style={styles.loginBtn} onPress={this.handleLogin}>
+          <Text>Login</Text>
+        </TouchableOpacity>
+
 
         <View>
           <TouchableOpacity
