@@ -112,61 +112,108 @@ const styles = StyleSheet.create({
 
 class Tasks extends React.Component {
   state = {
-    myState: '0',
-    sarcasm: 'serious',
-    sentiment: 0,
+    myState: 0,
     tweetUrl: '',
     mail: '',
     tweet_id: 0,
+    task_id: null,
+    task: null,
+    answers: [],
+    scalars: null,
+    nonscalars : null,
+    metricNumbers : 0,
+      selectedValue : null,
   };
 
   constructor(props: Props) {
     super(props);
+    this.state = {
+        myState: 0,
+        tweetUrl: '',
+        mail: '',
+        tweet_id: 0,
+        task_id: null,
+        task: null,
+        answers: [],
+        scalars: null,
+        nonscalars : null,
+        metricNumbers : 0,
+        selectedValue : null,
+    };
   }
 
   componentDidMount() {
     this.readStore();
   }
 
-  getTweetFromQueue = () => {
-    axios
+  getTweetFromQueue = async() => {
+
+      this.setState({answers :[]});
+    await axios
       .get('http://10.0.2.2:5000/get_tweet_to_answer/' + this.state.mail)
       .then(response => {
         if (response.data == null) {
-          this.setState({myState: '0'});
+          this.setState({myState: 0});
           alert('There is no task in the queue');
         } else {
-          this.setState({tweet_id: response.data.tweet_id});
+          this.setState({tweet_id: response.data.tweet_id, task_id: response.data.task_id});
           axios
-            .get('http://10.0.2.2:5000/get_tweet' + '/' + this.state.tweet_id)
+            .get('http://10.0.2.2:5000/get_tweet/'  + this.state.tweet_id + '/' + this.state.task_id)
             .then(response => {
               if (response.data == null) {
-                this.setState({myState: '0'});
+                this.setState({myState: 0});
               } else {
                 const value = response.data.url;
                 this.setState({tweetUrl: value});
-                this.setState({myState: '1'});
               }
             });
+
+          axios
+              .get('http://10.0.2.2:5000/get_task/' + this.state.task_id)
+              .then(response => {
+                if (response.data == null) {
+                  this.setState({myState: 0});
+                } else {
+
+
+                  const scalars = response.data.scalarMetrics.length;
+                  const nonscalars = response.data.nonScalarMetrics.length;
+
+                  if( nonscalars > 0)
+                  {
+                      let temp = this.state.answers;
+                      temp[0] = response.data.nonScalarMetrics[0].metricKeys[0];
+                      this.setState({ myState : 1, answers: temp, selectedValue : response.data.nonScalarMetrics[0].metricKeys[0], metricNumbers : scalars+nonscalars, scalars : response.data.scalarMetrics,
+                          nonscalars : response.data.nonScalarMetrics } );
+
+                  }
+                  else
+                  {
+                      let temp = this.state.answers;
+                      temp[0] = response.data.scalarMetrics[0].min;
+                      this.setState({ myState : 1, answers: temp, selectedValue : response.data.scalarMetrics[0].min, metricNumbers : scalars+nonscalars, scalars : response.data.scalarMetrics,
+                          nonscalars : response.data.nonScalarMetrics} );
+                  }
+                }
+              });
         }
       });
   };
 
   answerQuestion = () => {
+
+
     axios
-      .get(
-        'http://10.0.2.2:5000/add_response/' +
-          this.state.tweet_id +
-          '/' +
-          this.state.mail +
-          '/' +
-          this.state.sentiment +
-          '/' +
-          this.state.sarcasm,
+      .post(
+        'http://10.0.2.2:5000/add_response',
+          { tweet_id : this.state.tweet_id
+                ,task_id : this.state.task_id
+                ,mail : this.state.mail
+                ,answers : JSON.stringify(this.state.answers) }
       )
       .then(response => {
         if (response.data.message == 'failed') {
-          this.setState({myState: '0'});
+          this.setState({myState: 0});
         } else {
           this.getTweetFromQueue();
         }
@@ -188,147 +235,318 @@ class Tasks extends React.Component {
   };
 
   stateChange = () => {
-    if (this.state.myState == '1') {
-      this.setState({myState: '2'});
-    } else {
-      this.setState({myState: '1'});
-    }
+
+
+      if( this.state.myState < this.state.nonscalars.length )
+      {
+          let temp = this.state.answers;
+          temp[this.state.myState ] = this.state.nonscalars[this.state.myState ].metricKeys[0];
+          this.setState({ answers: temp, selectedValue : this.state.nonscalars[this.state.myState ].metricKeys[0],myState: this.state.myState+1 } );
+      }
+      else{
+          let temp = this.state.answers;
+          temp[this.state.myState ] = this.state.scalars[this.state.myState - this.state.nonscalars.length ].min;
+          this.setState({ answers: temp, selectedValue : this.state.scalars[this.state.myState - this.state.nonscalars.length ].min, myState: this.state.myState+1 } );
+      }
+
   };
 
-  setSarcasm(text) {
-    this.setState({sarcasm: text});
+    previousstateChange = () =>
+    {
+        if( this.state.myState != 1)
+        {
+            this.setState({myState: this.state.myState-1});
+        }
+
+    };
+
+  setAnswer=(text) => {
+      let temp = this.state.answers;
+      temp[this.state.myState - 1] = text;
+      this.setState({answers: temp, selectedValue : text});
+  };
+
+  getScalars =()=>
+  {
+      return this.state.scalars;
+  }
+
+  getnonScalars =()=>
+  {
+      return this.state.nonscalars;
   }
 
   render() {
-    if (this.state.myState == '0') {
-      return (
-        <View style={styles.container}>
-          <Text style={styles.textCenter}>Press the button to get task</Text>
-          <TouchableOpacity
-            style={styles.loginBtn}
-            onPress={this.getTweetFromQueue}>
-            <Text>Get Task</Text>
-          </TouchableOpacity>
-        </View>
-      );
-    } else if (this.state.myState == '1') {
-      return (
-        <View style={styles.container}>
-          <View style={styles.bos} />
-          <View style={styles.container2}>
-            <WebView
-              source={{
-                html:
-                  '<blockquote class="twitter-tweet"> <a href="' +
-                  this.state.tweetUrl +
-                  '"></a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>',
-              }}
-              javaScriptEnabled={true}
-              style={{
-                flex: 1,
-                width: windowWidth * (1),
-              }}
-              scalesPageToFit={false}
+      if( this.state.myState == 0)
+      {
+          return (
+              <View style={styles.container}>
+                  <Text style={styles.textCenter}>Press the button to get task</Text>
+                  <TouchableOpacity
+                      style={styles.loginBtn}
+                      onPress={this.getTweetFromQueue}>
+                      <Text>Get Task</Text>
+                  </TouchableOpacity>
+              </View>
+          );
+      }
+      else{
+          while( this.state.myState <= this.state.metricNumbers)
+          {
+            if( this.state.myState <= this.state.nonscalars.length)
+            {
+              let items = this.state.nonscalars[this.state.myState -1 ].metricKeys.map( (s, i) => {
+                return <Picker.Item key={i} value={s} label={s} />
+              });
+              if( this.state.myState != this.state.metricNumbers)
+              {
+                return(
+                    <View style={styles.container}>
+                      <View style={styles.bos} />
+                      <View style={styles.container2}>
+                        <WebView
+                            source={{
+                              html:
+                                  '<blockquote class="twitter-tweet"> <a href="' +
+                                  this.state.tweetUrl +
+                                  '"></a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>',
+                            }}
+                            javaScriptEnabled={true}
+                            style={{
+                              flex: 1,
+                              width: windowWidth * (1),
+                            }}
+                            scalesPageToFit={false}
 
-            />
-          </View>
-          <Text style={styles.TextInput}>
-            Determine the sarcasm type of this tweet.
-          </Text>
+                        />
+                      </View>
+                      <Text style={styles.TextInput}>
+                        {this.state.nonscalars[this.state.myState -1].name}.
+                      </Text>
 
-          <View style={styles.aralik}>
-            <Picker
-              selectedValue={this.state.sarcasm}
-              onValueChange={(itemValue, itemIndex) =>
-                this.setSarcasm(itemValue)
+                      <View style={styles.aralik}>
+                        <Picker
+                            selectedValue={this.state.selectedValue}
+                            onValueChange={(itemValue, itemIndex) =>
+                                this.setAnswer(itemValue)
+                            }
+                            style={{height: 50, width: 225}}>
+                          {items}
+                        </Picker>
+                      </View>
+
+                      <View style={styles.aralik}>
+                          <TouchableOpacity
+                              style={styles.nextButtonLeft}
+                              onPress={this.previousstateChange}>
+                              <Text>Previous</Text>
+                          </TouchableOpacity>
+                          <View style={styles.bos} />
+                        <TouchableOpacity
+                            style={styles.nextButtonRight}
+                            onPress={this.stateChange}>
+                          <Text>Next</Text>
+                        </TouchableOpacity>
+                      </View>
+
+                      <View style={styles.bos} />
+                    </View>
+                );
               }
-              style={{height: 50, width: 225}}>
-              <Picker.Item label="Serious" value="serious" />
-              <Picker.Item label="Sarcastic" value="sarcastic" />
-              <Picker.Item label="Mixed" value="mixed" />
-            </Picker>
-          </View>
+              else{
 
-          <View style={styles.aralik}>
-            <TouchableOpacity
-              style={styles.nextButtonLeft}
-              onPress={this.stateChange}>
-              <Text>Previous</Text>
-            </TouchableOpacity>
-            <View style={styles.bos} />
-            <TouchableOpacity
-              style={styles.nextButtonRight}
-              onPress={this.stateChange}>
-              <Text>Next</Text>
-            </TouchableOpacity>
-          </View>
+                return(
+                    <View style={styles.container}>
+                      <View style={styles.bos} />
+                      <View style={styles.container2}>
+                        <WebView
+                            source={{
+                              html:
+                                  '<blockquote class="twitter-tweet"> <a href="' +
+                                  this.state.tweetUrl +
+                                  '"></a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>',
+                            }}
+                            javaScriptEnabled={true}
+                            style={{
+                              flex: 1,
+                              width: windowWidth * (1),
+                            }}
+                            scalesPageToFit={false}
 
-          <View style={styles.bos} />
+                        />
+                      </View>
+                      <Text style={styles.TextInput}>
+                        {this.state.nonscalars[this.state.myState -1].name}.
+                      </Text>
+
+                      <View style={styles.aralik}>
+                        <Picker
+                            selectedValue={this.state.selectedValue}
+                            onValueChange={(itemValue, itemIndex) =>
+                                this.setAnswer(itemValue)
+                            }
+                            style={{height: 50, width: 225}}>
+                          {items}
+                        </Picker>
+                      </View>
+
+                      <View style={styles.aralik}>
+                          <TouchableOpacity
+                              style={styles.nextButtonLeft}
+                              onPress={this.stateChange}>
+                              <Text>Previous</Text>
+                          </TouchableOpacity>
+                          <View style={styles.bos} />
+                        <TouchableOpacity
+                            style={styles.nextButtonRight}
+                            onPress={this.answerQuestion}>
+                          <Text>Submit</Text>
+                        </TouchableOpacity>
+                      </View>
+
+                      <View style={styles.bos} />
+                    </View>
+                );
+              }
+
+
+
+            }
+            else
+            {
+                let minValue = parseInt(this.state.scalars[ this.state.myState - this.state.nonscalars.length - 1].min);
+                let maxValue = parseInt(this.state.scalars[ this.state.myState - this.state.nonscalars.length - 1].max);
+
+                if( this.state.myState != this.state.metricNumbers)
+                {
+                  return(
+                      <View style={styles.container}>
+                        <View style={styles.bos} />
+                        <View style={styles.container2}>
+                          <WebView
+                              source={{
+                                html:
+                                    '<blockquote class="twitter-tweet"> <a href="' +
+                                    this.state.tweetUrl +
+                                    '"></a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>',
+                              }}
+                              javaScriptEnabled={true}
+                              style={{
+                                flex: 1,
+                                width: windowWidth * (1),
+                              }}
+                              scalesPageToFit={false}
+
+                          />
+                        </View>
+
+                        <Text style={styles.TextInput}>
+                          Determine the { this.state.scalars[ this.state.myState - this.state.nonscalars.length - 1].name } of this tweet from {minValue} to {maxValue}
+                        </Text>
+
+                        <View style={{flex: 0.2, flexDirection: 'row'}}>
+                          <Text style={styles.title}>  {minValue}️</Text>
+                          <Slider
+                              style={{width: 200, height: 40}}
+                              minimumValue={minValue}
+                              maximumValue={maxValue}
+                              step={1}
+                              minimumTrackTintColor="#FFFFFF"
+                              maximumTrackTintColor="#000000"
+                              onValueChange={someValue =>this.setAnswer(someValue) }
+                          />
+                          <Text style={styles.title}>{maxValue}️</Text>
+                        </View>
+
+                        <View style={styles.aralik}>
+                          <TouchableOpacity
+                              style={styles.nextButtonLeft}
+                              onPress={this.previousstateChange}>
+                            <Text>Previous</Text>
+                          </TouchableOpacity>
+                          <View style={styles.bos} />
+                          <TouchableOpacity
+                              style={styles.nextButtonRight}
+                              onPress={this.stateChange}>
+                            <Text>Submit</Text>
+                          </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.bos} />
+                      </View>
+                  );
+                }
+                else{
+                  return(
+                      <View style={styles.container}>
+                        <View style={styles.bos} />
+                        <View style={styles.container2}>
+                          <WebView
+                              source={{
+                                html:
+                                    '<blockquote class="twitter-tweet"> <a href="' +
+                                    this.state.tweetUrl +
+                                    '"></a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>',
+                              }}
+                              javaScriptEnabled={true}
+                              style={{
+                                flex: 1,
+                                width: windowWidth * (1),
+                              }}
+                              scalesPageToFit={false}
+
+                          />
+                        </View>
+
+                        <Text style={styles.TextInput}>
+                          Determine the { this.state.scalars[ this.state.myState - this.state.nonscalars.length - 1].name } of this tweet from {minValue} to {maxValue}
+                        </Text>
+
+                        <View style={{flex: 0.2, flexDirection: 'row'}}>
+                          <Text style={styles.title}>  {minValue}️</Text>
+                          <Slider
+                              style={{width: 200, height: 40}}
+                              minimumValue={minValue}
+                              maximumValue={maxValue}
+                              step={1}
+                              minimumTrackTintColor="#FFFFFF"
+                              maximumTrackTintColor="#000000"
+                              onValueChange={someValue =>this.setAnswer(someValue) }
+                          />
+                          <Text style={styles.title}>{maxValue}️</Text>
+                        </View>
+
+                        <View style={styles.aralik}>
+                          <TouchableOpacity
+                              style={styles.nextButtonLeft}
+                              onPress={this.previousstateChange}>
+                            <Text>Previous</Text>
+                          </TouchableOpacity>
+                          <View style={styles.bos} />
+                          <TouchableOpacity
+                              style={styles.nextButtonRight}
+                              onPress={this.answerQuestion}>
+                            <Text>Submit</Text>
+                          </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.bos} />
+                      </View>
+                  );
+
+                }
+
+            }
+        }
+
+      }
+
+      return(
+        <View>
+            <Text style={styles.title}>  Hello️</Text>
         </View>
-      );
-    } else {
-      return (
-        <View style={styles.container}>
-          <View style={styles.bos} />
-          <View style={styles.container2}>
-            <WebView
-              source={{
-                html:
-                  '<blockquote class="twitter-tweet"> <a href="' +
-                  this.state.tweetUrl +
-                  '"></a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>',
-              }}
-              javaScriptEnabled={true}
-              style={{
-                flex: 1,
-                width: windowWidth * (1),
-              }}
-              scalesPageToFit={false}
+        );
 
-            />
-          </View>
-          <Text
-            style={styles.textCenter}
-            adjustsFontSizeToFit
-            numberOfLines={5}>
-            {this.state.tweetText}
-          </Text>
-          <Text style={styles.TextInput}>
-            Determine the sentiment of this tweet from 1 to 10
-          </Text>
-
-          <View style={{flex: 0.2, flexDirection: 'row'}}>
-            <Text style={styles.title}>☹️</Text>
-            <Slider
-              style={{width: 200, height: 40}}
-              minimumValue={0}
-              maximumValue={10}
-              step={1}
-              minimumTrackTintColor="#FFFFFF"
-              maximumTrackTintColor="#000000"
-              onValueChange={someValue => this.setState({sentiment: someValue})}
-            />
-            <Text style={styles.title}>☺️</Text>
-          </View>
-
-          <View style={styles.aralik}>
-            <TouchableOpacity
-              style={styles.nextButtonLeft}
-              onPress={this.stateChange}>
-              <Text>Previous</Text>
-            </TouchableOpacity>
-            <View style={styles.bos} />
-            <TouchableOpacity
-              style={styles.nextButtonRight}
-              onPress={this.answerQuestion}>
-              <Text>Submit</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.bos} />
-        </View>
-      );
-    }
   }
 }
 

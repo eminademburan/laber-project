@@ -19,7 +19,7 @@ import Home from './components/Home.js';
 import SignUp from './components/SignUp.js';
 import Settings from './components/Settings.js';
 import Tasks from './components/Tasks.js';
-
+import VoiceChat from './components/VoiceChat.tsx';
 import axios from 'axios';
 
 const Stack = createNativeStackNavigator();
@@ -71,6 +71,20 @@ function MyTabs(navigation) {
           ),
         }}
       />
+        <Tab.Screen
+            name="Voice Chat"
+            component={VoiceChat}
+            options={{
+                tabBarLabel: 'Voice Chat',
+                tabBarIcon: ({color, size}) => (
+                    <MaterialCommunityIcons
+                        name="account-settings-outline"
+                        color={color}
+                        size={size}
+                    />
+                ),
+            }}
+        />
     </Tab.Navigator>
   );
 }
