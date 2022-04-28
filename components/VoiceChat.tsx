@@ -1,158 +1,235 @@
-import * as React from 'react';
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ *
+ * @format
+ * @flow strict-local
+ */
+
+import React, {Component} from 'react';
+import type {Node} from 'react';
+import {Platform, Button, TextInput, View, PermissionsAndroid} from 'react-native'
+
+import RtcEngine from 'react-native-agora';
+
+RtcEngine.create('c1d043e419a6463f8c8775b42807aba7');
+
+import styles from './Style'
+
 import {
-    Text,
-    View,
+    SafeAreaView,
+    ScrollView,
+    StatusBar,
     StyleSheet,
-    Image,
-    TextInput,
-    Button,
-    TouchableOpacity,
+    Text,
+    useColorScheme,
 } from 'react-native';
-import Stars from 'react-native-stars';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    header: {
-        backgroundColor: '#32a8a8',
-        flex: 0.4,
-    },
-    headerContent: {
-        padding: 10,
-        alignItems: 'center',
-    },
-    avatar: {
-        width: 130,
-        height: 130,
-        borderRadius: 63,
-        borderWidth: 4,
-        borderColor: 'white',
-        marginBottom: 10,
-    },
-    name: {
-        fontSize: 22,
-        color: '#FFFFFF',
-        fontWeight: '600',
-    },
-    profileDetail: {
-        alignSelf: 'center',
-        marginTop: 200,
-        alignItems: 'center',
-        flexDirection: 'row',
-        position: 'absolute',
-        backgroundColor: '#ffffff',
-        flex: 0.2,
-    },
-    detailContent: {
-        margin: 10,
-        alignItems: 'center',
-    },
-    title: {
-        fontSize: 20,
-        color: '#00CED1',
-    },
-    count: {
-        fontSize: 18,
-    },
-    body: {
-        flex: 0.4,
-    },
-    bodyContent: {
-        flex: 1,
-        alignItems: 'center',
-        padding: 30,
-        marginTop: 40,
-    },
-    textInfo: {
-        fontSize: 18,
-        marginTop: 20,
-        color: '#696969',
-    },
-    buttonContainer: {
-        marginTop: 10,
-        height: 45,
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 20,
-        width: 250,
-        borderRadius: 30,
-        backgroundColor: '#00CED1',
-    },
-    description: {
-        fontSize: 20,
-        color: '#00CED1',
-        marginTop: 10,
-        textAlign: 'center',
-    },
-    myStarStyle: {
-        color: 'yellow',
-        backgroundColor: 'transparent',
-        textShadowColor: 'black',
-        textShadowOffset: {width: 1, height: 1},
-        textShadowRadius: 2,
-    },
-    myEmptyStarStyle: {
-        color: 'white',
-    },
-});
+import {
+    Colors,
+    DebugInstructions,
+    Header,
+    LearnMoreLinks,
+    ReloadInstructions,
+} from 'react-native/Libraries/NewAppScreen';
 
-class VoiceChat extends React.Component {
-    state = {
-        mail: '',
-        username: '',
-    };
+const Section = ({children, title}): Node => {
+    const isDarkMode = useColorScheme() === 'dark';
+    return (
+        <View style={styles.sectionContainer}>
+            <Text
+                style={[
+                    styles.sectionTitle,
+                    {
+                        color: isDarkMode ? Colors.white : Colors.black,
+                    },
+                ]}>
+                {title}
+            </Text>
+            <Text
+                style={[
+                    styles.sectionDescription,
+                    {
+                        color: isDarkMode ? Colors.light : Colors.dark,
+                    },
+                ]}>
+                {children}
+            </Text>
+        </View>
+    );
+};
 
-
-    componentDidMount() {
-        this.readStore();
-    }
-
-    readStore = async () => {
-        try {
-            const value = await AsyncStorage.getItem('mail');
-            if (value == null) {
-                this.readStore();
-            } else if (value !== null) {
-                this.setState({mail: value});
-                this.findUserName();
-            }
-        } catch (e) {
-            // error reading value
+const requestCameraAndAudioPermission = async () => {
+    try {
+        const granted = await PermissionsAndroid.requestMultiple([
+            PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+        ])
+        if (
+            granted['android.permission.RECORD_AUDIO'] === PermissionsAndroid.RESULTS.GRANTED
+        ) {
+            console.log('You can use the mic')
+        } else {
+            console.log('Permission denied')
         }
-    };
-
-    findUserName() {
-        axios.post('http://10.0.2.2:5000/get_user' , {email: this.state.mail})
-            .then(response => {
-                if (response.data == null) {
-                    alert('email or password is wrong ');
-                } else {
-                    this.setState({username: response.data.name});
-                }
-            });
-    }
-
-    handleLogout = async () => {
-        try {
-            await AsyncStorage.removeItem('mail');
-            await AsyncStorage.removeItem('password');
-            await AsyncStorage.removeItem('username');
-        } catch (exception) {
-            return false;
-        }
-    };
-
-    render() {
-        return(
-            <View><Text>{this.state.username}</Text></View>
-        );
-
+    } catch (err) {
+        console.warn(err)
     }
 }
 
-export default VoiceChat;
+// Define a Props interface.
+interface Props {
+}
+
+// Define a State interface.
+interface State {
+    appId: string,
+    token: string,
+    channelName: string,
+    joinSucceed: boolean,
+    openMicrophone: boolean,
+    enableSpeakerphone: boolean,
+    peerIds: number[],
+}
+
+// Create an App component, which extends the properties of the Pros and State interfaces.
+export default class VoiceChat extends Component<Props, State> {
+    _engine?: RtcEngine
+    // Add a constructor，and initialize this.state. You need:
+    // Replace yourAppId with the App ID of your Agora project.
+    // Replace yourChannel with the channel name that you want to join.
+    // Replace yourToken with the token that you generated using the App ID and channel name above.
+    constructor(props) {
+        super(props)
+        this.state = {
+            appId: `c1d043e419a6463f8c8775b42807aba7`,
+            token: '006c1d043e419a6463f8c8775b42807aba7IADYAaDPrcizUKH04SQ67uFHPVzpEE0K9Yp3LWVWhwHvjWx50dUAAAAAEABCT9GlBfhrYgEAAQAG+Gti',
+            channelName: 'laberchannel',
+            openMicrophone: true,
+            enableSpeakerphone: true,
+            joinSucceed: false,
+            peerIds: []
+        }
+        if (Platform.OS === 'android') {
+            // Request required permissions from Android
+            requestCameraAndAudioPermission().then(() => {
+                console.log('requested!')
+            })
+        }
+    }
+
+    // Other code. See step 5 to step 9.
+    // Mount the App component into the DOM.
+    componentDidMount() {
+        this.init()
+    }
+
+// Pass in your App ID through this.state, create and initialize an RtcEngine object.
+    init = async () => {
+        const {appId} = this.state
+        this._engine = await RtcEngine.create(appId)
+        // Enable the audio module.
+        await this._engine.enableAudio()
+
+
+        // Listen for the UserJoined callback.
+        // This callback occurs when the remote user successfully joins the channel.
+        this._engine.addListener('UserJoined', (uid, elapsed) => {
+            console.log('UserJoined', uid, elapsed)
+            const {peerIds} = this.state
+            if (peerIds.indexOf(uid) === -1) {
+                this.setState({
+                    peerIds: [...peerIds, uid]
+                })
+            }
+        })
+
+
+        // Listen for the UserOffline callback.
+        // This callback occurs when the remote user leaves the channel or drops offline.
+        this._engine.addListener('UserOffline', (uid, reason) => {
+            console.log('UserOffline', uid, reason)
+            const {peerIds} = this.state
+            this.setState({
+                // Remove peer ID from state array
+                peerIds: peerIds.filter(id => id !== uid)
+            })
+        })
+
+        // Listen for the JoinChannelSuccess callback.
+        // This callback occurs when the local user successfully joins the channel.
+        this._engine.addListener('JoinChannelSuccess', (channel, uid, elapsed) => {
+            console.log('JoinChannelSuccess', channel, uid, elapsed)
+            this.setState({
+                joinSucceed: true
+            })
+        })
+    }
+
+    // Pass in your token and channel name through this.state.token and this.state.channelName.
+// Set the ID of the local user, which is an integer and should be unique. If you set uid as 0,
+// the SDK assigns a user ID for the local user and returns it in the JoinChannelSuccess callback.
+    _joinChannel = async () => {
+        await this._engine?.joinChannel(this.state.token, this.state.channelName, null, 0)
+    }
+
+    // Turn the microphone on or off.
+    _switchMicrophone = () => {
+        const { openMicrophone } = this.state
+        this._engine?.enableLocalAudio(!openMicrophone).then(() => {
+            this.setState({ openMicrophone: !openMicrophone })
+        }).catch((err) => {
+            console.warn('enableLocalAudio', err)
+        })
+    }
+
+// Switch the audio playback device.
+    _switchSpeakerphone = () => {
+        const { enableSpeakerphone } = this.state
+        this._engine?.setEnableSpeakerphone(!enableSpeakerphone).then(() => {
+            this.setState({ enableSpeakerphone: !enableSpeakerphone })
+        }).catch((err) => {
+            console.warn('setEnableSpeakerphone', err)
+        })
+    }
+
+    render() {
+        const {
+            channelName,
+            joinSucceed,
+            openMicrophone,
+            enableSpeakerphone,
+        } = this.state;
+        return (
+            <View style={styles.container}>
+                <View style={styles.top}>
+                    <TextInput
+                        style={styles.input}
+                        onChangeText={(text) => this.setState({ channelName: text })}
+                        placeholder={'Channel Name'}
+                        value={channelName}
+                    />
+                    <Button
+                        onPress={joinSucceed ? this._leaveChannel : this._joinChannel}
+                        title={`${joinSucceed ? 'Leave' : 'Join'} channel`}
+                    />
+                </View>
+                <View style={styles.float}>
+                    <Button
+                        onPress={this._switchMicrophone}
+                        title={`Microphone ${openMicrophone ? 'on' : 'off'}`}
+                    />
+                    <Button
+                        onPress={this._switchSpeakerphone}
+                        title={enableSpeakerphone ? 'Speakerphone' : 'Earpiece'}
+                    />
+                </View>
+            </View>
+        )
+    }
+
+    _leaveChannel = async () => {
+        await this._engine?.leaveChannel()
+        this.setState({peerIds: [], joinSucceed: false})
+    }
+}
+

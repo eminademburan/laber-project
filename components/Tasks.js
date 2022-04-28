@@ -201,8 +201,6 @@ class Tasks extends React.Component {
   };
 
   answerQuestion = () => {
-
-
     axios
       .post(
         'http://10.0.2.2:5000/add_response',
@@ -235,8 +233,6 @@ class Tasks extends React.Component {
   };
 
   stateChange = () => {
-
-
       if( this.state.myState < this.state.nonscalars.length )
       {
           let temp = this.state.answers;
@@ -248,7 +244,6 @@ class Tasks extends React.Component {
           temp[this.state.myState ] = this.state.scalars[this.state.myState - this.state.nonscalars.length ].min;
           this.setState({ answers: temp, selectedValue : this.state.scalars[this.state.myState - this.state.nonscalars.length ].min, myState: this.state.myState+1 } );
       }
-
   };
 
     previousstateChange = () =>
