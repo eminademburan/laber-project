@@ -7,7 +7,7 @@ import {
   TextInput,
   Button,
   TouchableOpacity,
-  Dimensions
+  Dimensions,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -15,7 +15,6 @@ import {WebView} from 'react-native-webview';
 
 const windowWidth = Dimensions.get('screen').width;
 const windowHeight = Dimensions.get('screen').height;
-
 
 const styles = StyleSheet.create({
   container: {
@@ -26,9 +25,9 @@ const styles = StyleSheet.create({
   },
   container2: {
     flex: 0.5,
-    backgroundColor: "#fff",
-    justifyContent: "center",
-    marginTop: windowHeight/5,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    marginTop: windowHeight / 5,
   },
   TextInput: {
     height: 50,
@@ -81,19 +80,20 @@ class Home extends React.Component {
   };
 
   handleLogin = () => {
-    axios.post('http://10.0.2.2:5000/get_user',{email: this.state.email})
-        .then(response => {
-              if (response.data == null) {
-                alert('email or password is wrong ');
-              }
-              else if (this.state.password == response.data.password)
-              {
-                this.setState({name: response.data.name});
-                this.storeData();
-                this.props.navigation.navigate('MyTabs');
-              }
-            }
-        );
+    axios
+      .post(
+        'http://laber-env.eba-65gdmegc.us-east-1.elasticbeanstalk.com/get_user',
+        {email: this.state.email},
+      )
+      .then(response => {
+        if (response.data == null) {
+          alert('email or password is wrong ');
+        } else if (this.state.password == response.data.password) {
+          this.setState({name: response.data.name});
+          this.storeData();
+          this.props.navigation.navigate('MyTabs');
+        }
+      });
   };
 
   storeData = async () => {
@@ -133,7 +133,6 @@ class Home extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-
         <View style={styles.inputView}>
           <TextInput
             style={styles.TextInput}
@@ -156,7 +155,6 @@ class Home extends React.Component {
         <TouchableOpacity style={styles.loginBtn} onPress={this.handleLogin}>
           <Text>Login</Text>
         </TouchableOpacity>
-
 
         <View>
           <TouchableOpacity

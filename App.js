@@ -71,20 +71,20 @@ function MyTabs(navigation) {
           ),
         }}
       />
-        <Tab.Screen
-            name="Voice Chat"
-            component={VoiceChat}
-            options={{
-                tabBarLabel: 'Voice Chat',
-                tabBarIcon: ({color, size}) => (
-                    <MaterialCommunityIcons
-                        name="account-settings-outline"
-                        color={color}
-                        size={size}
-                    />
-                ),
-            }}
-        />
+      <Tab.Screen
+        name="Voice Chat"
+        component={VoiceChat}
+        options={{
+          tabBarLabel: 'Voice Chat',
+          tabBarIcon: ({color, size}) => (
+            <MaterialCommunityIcons
+              name="account-settings-outline"
+              color={color}
+              size={size}
+            />
+          ),
+        }}
+      />
     </Tab.Navigator>
   );
 }

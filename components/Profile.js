@@ -130,7 +130,11 @@ class Profile extends React.Component {
   };
 
   findUserName() {
-    axios.post('http://10.0.2.2:5000/get_user' , {email: this.state.mail})
+    axios
+      .post(
+        'http://laber-env.eba-65gdmegc.us-east-1.elasticbeanstalk.com/get_user',
+        {email: this.state.mail},
+      )
       .then(response => {
         if (response.data == null) {
           alert('email or password is wrong ');
