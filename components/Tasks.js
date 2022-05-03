@@ -21,6 +21,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {WebView} from 'react-native-webview';
 import {Props} from 'react-native-paper/lib/typescript/components/RadioButton/RadioButton';
+import {baseURL} from '../constants';
 
 const windowWidth = Dimensions.get('screen').width;
 const windowHeight = Dimensions.get('screen').height;
@@ -156,10 +157,7 @@ class Tasks extends React.Component {
 
   checkVoiceChat = async () => {
     await axios
-      .get(
-        'http://laber-env.eba-65gdmegc.us-east-1.elasticbeanstalk.com/check_voicechat/' +
-          this.state.mail,
-      )
+      .get(baseURL + '/check_voicechat/' + this.state.mail)
       .then(response => {
         if (response.data == null) {
           console.log('no pending voice chat');
@@ -171,10 +169,10 @@ class Tasks extends React.Component {
           console.log(
             'voice chat found, channelName: ' + this.state.channelName,
           );
-          console.log('voice chat found, token: ' + this.state.token);
+          console.log('voice chat found, token: ' + this.state.channelToken);
           try {
             AsyncStorage.setItem('channelName', this.state.channelName);
-            AsyncStorage.setItem('channelToken', this.state.token);
+            AsyncStorage.setItem('channelToken', this.state.channelToken);
           } catch (e) {}
         }
       });
@@ -183,10 +181,7 @@ class Tasks extends React.Component {
   getTweetFromQueue = async () => {
     this.setState({answers: []});
     await axios
-      .get(
-        'http://laber-env.eba-65gdmegc.us-east-1.elasticbeanstalk.com/get_tweet_to_answer/' +
-          this.state.mail,
-      )
+      .get(baseURL + '/get_tweet_to_answer/' + this.state.mail)
       .then(response => {
         if (response.data == null) {
           this.setState({myState: 0});
@@ -198,7 +193,8 @@ class Tasks extends React.Component {
           });
           axios
             .get(
-              'http://laber-env.eba-65gdmegc.us-east-1.elasticbeanstalk.com/get_tweet/' +
+              baseURL +
+                '/get_tweet/' +
                 this.state.tweet_id +
                 '/' +
                 this.state.task_id,
@@ -213,10 +209,7 @@ class Tasks extends React.Component {
             });
 
           axios
-            .get(
-              'http://laber-env.eba-65gdmegc.us-east-1.elasticbeanstalk.com/get_task/' +
-                this.state.task_id,
-            )
+            .get(baseURL + '/get_task/' + this.state.task_id)
             .then(response => {
               if (response.data == null) {
                 this.setState({myState: 0});
@@ -256,15 +249,12 @@ class Tasks extends React.Component {
 
   answerQuestion = () => {
     axios
-      .post(
-        'http://laber-env.eba-65gdmegc.us-east-1.elasticbeanstalk.com/add_response',
-        {
-          tweet_id: this.state.tweet_id,
-          task_id: this.state.task_id,
-          mail: this.state.mail,
-          answers: JSON.stringify(this.state.answers),
-        },
-      )
+      .post(baseURL + '/add_response', {
+        tweet_id: this.state.tweet_id,
+        task_id: this.state.task_id,
+        mail: this.state.mail,
+        answers: JSON.stringify(this.state.answers),
+      })
       .then(response => {
         if (response.data.message == 'failed') {
           this.setState({myState: 0});

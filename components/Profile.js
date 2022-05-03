@@ -12,6 +12,7 @@ import Stars from 'react-native-stars';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import {baseURL} from '../constants';
 
 const styles = StyleSheet.create({
   container: {
@@ -131,10 +132,7 @@ class Profile extends React.Component {
 
   findUserName() {
     axios
-      .post(
-        'http://laber-env.eba-65gdmegc.us-east-1.elasticbeanstalk.com/get_user',
-        {email: this.state.mail},
-      )
+      .post(baseURL + '/get_user', {email: this.state.mail})
       .then(response => {
         if (response.data == null) {
           alert('email or password is wrong ');

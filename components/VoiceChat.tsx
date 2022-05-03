@@ -15,6 +15,7 @@ import {
   View,
   PermissionsAndroid,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import RtcEngine from 'react-native-agora';
 
@@ -109,8 +110,8 @@ export default class VoiceChat extends Component<Props, State> {
     this.state = {
       appId: 'c1d043e419a6463f8c8775b42807aba7',
       token:
-        '006c1d043e419a6463f8c8775b42807aba7IADYAaDPrcizUKH04SQ67uFHPVzpEE0K9Yp3LWVWhwHvjWx50dUAAAAAEABCT9GlBfhrYgEAAQAG+Gti',
-      channelName: 'laberchannel',
+        '006c1d043e419a6463f8c8775b42807aba7IABmZ3E1zFPxRjCSWWd77OU151uQr0oSIBKdu6ozbTHuvBpA+doAAAAAIgC6IRICF4ByYgQAAQBkKXFiAgBkKXFiAwBkKXFiBABkKXFi',
+      channelName: '1519376998455517184',
       openMicrophone: true,
       enableSpeakerphone: true,
       joinSucceed: false,
@@ -128,7 +129,7 @@ export default class VoiceChat extends Component<Props, State> {
   // Mount the App component into the DOM.
   componentDidMount() {
     this.init();
-    this.readStore();
+    // this.readStore();
   }
 
   readStore = async () => {

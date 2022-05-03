@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import CountryPicker from 'react-native-country-picker-modal';
+import {baseURL} from '../constants';
 
 const windowWidth = Dimensions.get('screen').width;
 
@@ -190,20 +191,17 @@ class SignUp extends React.Component {
   handleSignup = () => {
     if (this.validateUserInfo()) {
       axios
-        .post(
-          'http://laber-env.eba-65gdmegc.us-east-1.elasticbeanstalk.com/add_user',
-          {
-            email: this.state.email,
-            name: this.state.name,
-            surname: this.state.surname,
-            phone: this.state.phone,
-            age: this.state.age,
-            region: this.state.region,
-            language: this.state.language,
-            password: this.state.password,
-            link: this.state.link,
-          },
-        )
+        .post(baseURL + '/add_user', {
+          email: this.state.email,
+          name: this.state.name,
+          surname: this.state.surname,
+          phone: this.state.phone,
+          age: this.state.age,
+          region: this.state.region,
+          language: this.state.language,
+          password: this.state.password,
+          link: this.state.link,
+        })
         .then(response => {
           if (response.data.message == 'success') {
             alert('your account has been created');
