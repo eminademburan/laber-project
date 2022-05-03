@@ -20,6 +20,7 @@ import JSONbigint from 'json-bigint';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {WebView} from 'react-native-webview';
+import {Props} from 'react-native-paper/lib/typescript/components/RadioButton/RadioButton';
 
 const windowWidth = Dimensions.get('screen').width;
 const windowHeight = Dimensions.get('screen').height;
@@ -138,12 +139,46 @@ class Tasks extends React.Component {
       nonscalars: null,
       metricNumbers: 0,
       selectedValue: null,
+      channelName: null,
+      channelToken: null,
     };
   }
 
   componentDidMount() {
+    setInterval(
+      function () {
+        this.checkVoiceChat();
+      }.bind(this),
+      5000,
+    );
     this.readStore();
   }
+
+  checkVoiceChat = async () => {
+    await axios
+      .get(
+        'http://laber-env.eba-65gdmegc.us-east-1.elasticbeanstalk.com/check_voicechat/' +
+          this.state.mail,
+      )
+      .then(response => {
+        if (response.data == null) {
+          console.log('no pending voice chat');
+        } else {
+          this.setState({
+            channelName: response.data.name,
+            channelToken: response.data.token,
+          });
+          console.log(
+            'voice chat found, channelName: ' + this.state.channelName,
+          );
+          console.log('voice chat found, token: ' + this.state.token);
+          try {
+            AsyncStorage.setItem('channelName', this.state.channelName);
+            AsyncStorage.setItem('channelToken', this.state.token);
+          } catch (e) {}
+        }
+      });
+  };
 
   getTweetFromQueue = async () => {
     this.setState({answers: []});
