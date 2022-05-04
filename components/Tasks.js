@@ -248,12 +248,14 @@ class Tasks extends React.Component {
   };
 
   answerQuestion = () => {
+    const tempdate = new Date();
     axios
       .post(baseURL + '/add_response', {
         tweet_id: this.state.tweet_id,
         task_id: this.state.task_id,
         mail: this.state.mail,
         answers: JSON.stringify(this.state.answers),
+        date: tempdate
       })
       .then(response => {
         if (response.data.message == 'failed') {
