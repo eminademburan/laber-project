@@ -151,7 +151,7 @@ class Profile extends React.Component {
     } catch (exception) {
       return false;
     }
-  };
+  }
 
   render() {
     return (
@@ -168,17 +168,17 @@ class Profile extends React.Component {
           </View>
         </View>
 
-        <View style={styles.profileDetail}>
-          <View style={styles.detailContent}>
-            <Text style={styles.title}>Photos {'\u0024'}</Text>
-          </View>
-          <View style={styles.detailContent}>
-            <Text style={styles.title}>Followers {'\u20BF'}</Text>
-          </View>
-          <View style={styles.detailContent}>
-            <Text style={styles.title}>Score: 54.7</Text>
-          </View>
-        </View>
+        {/*<View style={styles.profileDetail}>*/}
+        {/*  <View style={styles.detailContent}>*/}
+        {/*    <Text style={styles.title}>Photos {'\u0024'}</Text>*/}
+        {/*  </View>*/}
+        {/*  <View style={styles.detailContent}>*/}
+        {/*    <Text style={styles.title}>Followers {'\u20BF'}</Text>*/}
+        {/*  </View>*/}
+        {/*  <View style={styles.detailContent}>*/}
+        {/*    <Text style={styles.title}>Score: 54.7</Text>*/}
+        {/*  </View>*/}
+        {/*</View>*/}
 
         {/*<View style={{alignItems: 'center', paddingTop: 50}}>
           <Stars
@@ -198,12 +198,8 @@ class Profile extends React.Component {
 
         <View style={styles.body}>
           <View style={styles.bodyContent}>
-            <TouchableOpacity style={styles.buttonContainer}>
-              <Text>Friends</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonContainer}>
-              <Text>Friend Requests</Text>
-            </TouchableOpacity>
+            <Text style={styles.title}>Completed Tasks: 5</Text>
+            <Text style={styles.title}>Credit: $10</Text>
             <TouchableOpacity
               onPress={this.handleLogout}
               style={styles.buttonContainer}>

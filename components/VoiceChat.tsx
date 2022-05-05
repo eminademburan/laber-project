@@ -230,25 +230,24 @@ export default class VoiceChat extends Component<Props, State> {
     return (
       <View style={styles.container}>
         <View style={styles.top}>
-          <TextInput
-            style={styles.input}
-            placeholder={'Channel Name'}
-            value={channelName}
-          />
-          <TextInput style={styles.input} placeholder={'token'} value={token} />
+          {/*<TextInput*/}
+          {/*  style={styles.input}*/}
+          {/*  placeholder={'Channel Name'}*/}
+          {/*  value={channelName}*/}
+          {/*/>*/}
+          {/*<TextInput style={styles.input} placeholder={'token'} value={token} />*/}
           <Button
             onPress={joinSucceed ? this._leaveChannel : this._joinChannel}
             title={`${joinSucceed ? 'Leave' : 'Join'} channel`}
           />
         </View>
         <View style={styles.float}>
+
+
           <Button
+
             onPress={this._switchMicrophone}
             title={`Microphone ${openMicrophone ? 'on' : 'off'}`}
-          />
-          <Button
-            onPress={this._switchSpeakerphone}
-            title={enableSpeakerphone ? 'Speakerphone' : 'Earpiece'}
           />
         </View>
       </View>

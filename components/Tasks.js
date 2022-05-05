@@ -43,14 +43,13 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   container2: {
-    flex: 1,
+    flex: 1.8,
     backgroundColor: '#fff',
   },
   bos: {
     flex: 0.2,
   },
   loginBtn: {
-    flex: 0.5,
     borderRadius: 25,
     alignItems: 'center',
     justifyContent: 'center',
@@ -59,6 +58,8 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
     backgroundColor: '#32a8a8',
+    height: 90,
+    width: 90,
   },
   aralik: {
     flex: 0.2,
@@ -349,7 +350,7 @@ class Tasks extends React.Component {
           if (this.state.myState != this.state.metricNumbers) {
             return (
               <View style={styles.container}>
-                <View style={styles.bos} />
+
                 <View style={styles.container2}>
                   <WebView
                     source={{

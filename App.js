@@ -43,7 +43,7 @@ function MyTabs(navigation) {
         options={{
           tabBarLabel: 'Tasks',
           tabBarIcon: ({color, size}) => (
-            <MaterialCommunityIcons name="store" color={color} size={size} />
+            <MaterialCommunityIcons name="format-list-checkbox" color={color} size={size} />
           ),
         }}
       />
@@ -54,7 +54,7 @@ function MyTabs(navigation) {
           tabBarLabel: 'Voice Chat',
           tabBarIcon: ({color, size}) => (
             <MaterialCommunityIcons
-              name="account-settings-outline"
+              name="microphone"
               color={color}
               size={size}
             />
@@ -73,6 +73,7 @@ export default class App extends React.Component {
           <Stack.Screen name="Home" component={Home} />
           <Stack.Screen name="SignUp" component={SignUp} />
           <Stack.Screen name="MyTabs" component={MyTabs} />
+
         </Stack.Navigator>
       </NavigationContainer>
     );
