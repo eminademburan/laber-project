@@ -254,7 +254,7 @@ class Tasks extends React.Component {
         tweet_id: this.state.tweet_id,
         task_id: this.state.task_id,
         mail: this.state.mail,
-        answers: JSON.stringify(this.state.answers),
+        answers: this.state.answers,
         date: tempdate
       })
       .then(response => {
