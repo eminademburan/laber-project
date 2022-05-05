@@ -1,13 +1,4 @@
 import * as React from 'react';
-import {
-  Text,
-  View,
-  Button,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  SafeAreaView,
-} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -20,7 +11,6 @@ import SignUp from './components/SignUp.js';
 import Settings from './components/Settings.js';
 import Tasks from './components/Tasks.js';
 import VoiceChat from './components/VoiceChat.tsx';
-import axios from 'axios';
 
 const Stack = createNativeStackNavigator();
 

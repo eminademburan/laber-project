@@ -255,7 +255,7 @@ class Tasks extends React.Component {
         task_id: this.state.task_id,
         mail: this.state.mail,
         answers: this.state.answers,
-        date: tempdate
+        date: tempdate,
       })
       .then(response => {
         if (response.data.message == 'failed') {
