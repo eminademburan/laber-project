@@ -48,20 +48,6 @@ function MyTabs(navigation) {
         }}
       />
       <Tab.Screen
-        name="Settings"
-        component={Tasks}
-        options={{
-          tabBarLabel: 'Settings',
-          tabBarIcon: ({color, size}) => (
-            <MaterialCommunityIcons
-              name="account-settings-outline"
-              color={color}
-              size={size}
-            />
-          ),
-        }}
-      />
-      <Tab.Screen
         name="Voice Chat"
         component={VoiceChat}
         options={{
