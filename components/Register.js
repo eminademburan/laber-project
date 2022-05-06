@@ -7,9 +7,10 @@ import {
 } from 'react-native';
 
 import Logo from './Logo';
-import Form from './Form';
+import RegistrationForm from './RegistrationForm';
 import * as React from 'react';
-import { MAIN_COLOR } from "../constants";
+import { BASE_URL, MAIN_COLOR } from "../constants";
+import axios from "axios";
 
 export default class Register extends React.Component {
 
@@ -22,11 +23,17 @@ export default class Register extends React.Component {
     this.props.navigation.goBack()
   }
 
+
+
   render() {
     return(
       <View style={styles.container}>
+
         <Logo/>
-        <Form type="Signup"/>
+
+
+        <RegistrationForm type="Signup"/>
+
         <View style={styles.signupTextCont}>
           <Text style={styles.signupText}>Already have an account?</Text>
           <TouchableOpacity onPress={this.goBack}><Text style={styles.signupButton}> Sign in</Text></TouchableOpacity>
