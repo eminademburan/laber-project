@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import CountryPicker from 'react-native-country-picker-modal';
-import {baseURL} from '../constants';
+import {BASE_URL} from '../constants';
 
 const windowWidth = Dimensions.get('screen').width;
 
@@ -191,7 +191,7 @@ class SignUp extends React.Component {
   handleSignup = () => {
     if (this.validateUserInfo()) {
       axios
-        .post(baseURL + '/add_user', {
+        .post(BASE_URL + '/add_user', {
           email: this.state.email,
           name: this.state.name,
           surname: this.state.surname,

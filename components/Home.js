@@ -12,7 +12,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import {WebView} from 'react-native-webview';
-import {baseURL} from '../constants';
+import {BASE_URL} from '../constants';
 
 const windowWidth = Dimensions.get('screen').width;
 const windowHeight = Dimensions.get('screen').height;
@@ -82,7 +82,7 @@ class Home extends React.Component {
 
   handleLogin = () => {
     axios
-      .post(baseURL + '/get_user', {email: this.state.email})
+      .post(BASE_URL + '/get_user', {email: this.state.email})
       .then(response => {
         if (response.data == null) {
           alert('email or password is wrong ');

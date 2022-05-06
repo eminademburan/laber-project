@@ -24,6 +24,7 @@
     "react-native-agora": "^3.6.2",
     "react-native-checkbox-group": "^1.0.3",
     "react-native-country-picker-modal": "^2.0.0",
+    "react-native-indicators": "^0.17.0",
     "react-native-material-design": "^0.3.7",
     "react-native-multiple-choice-picker": "^1.0.6",
     "react-native-paper": "^4.11.2",
