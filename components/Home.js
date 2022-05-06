@@ -156,7 +156,7 @@ class Home extends React.Component {
 
         <View>
           <TouchableOpacity
-            onPress={() => this.props.navigation.navigate('SignUp')}>
+            onPress={() => this.props.navigation.navigate('Register')}>
             <Text style={styles.forgot_button}>Create Account? </Text>
           </TouchableOpacity>
         </View>

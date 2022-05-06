@@ -11,6 +11,7 @@ import SignUp from './components/SignUp.js';
 import Settings from './components/Settings.js';
 import Tasks from './components/Tasks.js';
 import VoiceChat from './components/VoiceChat.tsx';
+import Register from "./components/Register";
 
 const Stack = createNativeStackNavigator();
 
@@ -18,6 +19,7 @@ const Tab = createBottomTabNavigator();
 
 function MyTabs(navigation) {
   return (
+
     <Tab.Navigator
       initialRouteName="Feed"
       screenOptions={{
@@ -66,12 +68,14 @@ function MyTabs(navigation) {
 }
 
 export default class App extends React.Component {
+
   render() {
     return (
       <NavigationContainer>
         <Stack.Navigator screenOptions={{headerShown: false}}>
           <Stack.Screen name="Home" component={Home} />
           <Stack.Screen name="SignUp" component={SignUp} />
+          <Stack.Screen name="Register" component={Register} />
           <Stack.Screen name="MyTabs" component={MyTabs} />
 
         </Stack.Navigator>

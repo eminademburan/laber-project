@@ -309,7 +309,7 @@ class SignUp extends React.Component {
             <Text>Back</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.loginBtn} onPress={this.handleSignup}>
-            <Text>Sign In</Text>
+            <Text>Sign Up</Text>
           </TouchableOpacity>
         </View>
       </View>
