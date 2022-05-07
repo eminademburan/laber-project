@@ -1,32 +1,32 @@
-import * as React from 'react';
-import {useState, useEffect} from 'react';
-import {
-  View,
-  Button,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  SafeAreaView,
-  CheckBox,
-  Component,
-  Dimensions,
-} from 'react-native';
-import {RadioButton, Text} from 'react-native-paper';
-import {Image} from 'react-native';
-import Slider from '@react-native-community/slider';
-import {Picker} from '@react-native-picker/picker';
-import {FrownOutlined, SmileOutlined} from '@ant-design/icons';
-import JSONbigint from 'json-bigint';
-import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {WebView} from 'react-native-webview';
-import {Props} from 'react-native-paper/lib/typescript/components/RadioButton/RadioButton';
-import {baseURL} from '../constants';
+import * as React from "react";
+import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Text } from "react-native-paper";
+import Slider from "@react-native-community/slider";
+import { Picker } from "@react-native-picker/picker";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { WebView } from "react-native-webview";
+import { Props } from "react-native-paper/lib/typescript/components/RadioButton/RadioButton";
+import { BASE_URL } from "../constants";
+import { DotIndicator } from "react-native-indicators";
 
 const windowWidth = Dimensions.get('screen').width;
 const windowHeight = Dimensions.get('screen').height;
 
 const styles = StyleSheet.create({
+  waitingContainer: {
+    padding: 60,
+    flex: 0.6,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#d3e0e0',
+    borderRadius: 25,
+  },
+  waitingText: {
+    flex: 0.3,
+    justifyContent: 'center',
+    fontSize: 20,
+  },
   container: {
     flex: 1,
     alignItems: 'center',
@@ -43,14 +43,13 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   container2: {
-    flex: 1,
+    flex: 1.8,
     backgroundColor: '#fff',
   },
   bos: {
     flex: 0.2,
   },
   loginBtn: {
-    flex: 0.5,
     borderRadius: 25,
     alignItems: 'center',
     justifyContent: 'center',
@@ -59,6 +58,8 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
     backgroundColor: '#32a8a8',
+    height: 90,
+    width: 90,
   },
   aralik: {
     flex: 0.2,
@@ -73,43 +74,45 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   nextButtonLeft: {
-    flex: 0.3,
+    flex: 0.5,
     width: '50%',
-    borderRadius: 25,
     height: 50,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 20,
-    marginBottom: 20,
-    marginLeft: 10,
-    marginRight: 50,
-    backgroundColor: '#fc8403',
+    borderTopRightRadius: 10,
+    marginTop: 40,
+    marginRight: 20,
+    backgroundColor: '#00CED1',
   },
   nextButtonRight: {
-    flex: 0.3,
+    flex: 0.5,
     width: '50%',
-    borderRadius: 25,
     height: 50,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 20,
-    marginBottom: 20,
-    marginLeft: 50,
-    marginRight: 10,
-    backgroundColor: '#fc8403',
+    borderTopLeftRadius: 10,
+    marginTop: 40,
+    marginLeft: 80,
+    backgroundColor: '#00CED1',
   },
   forgot_button: {
     marginBottom: 20,
-  },
-  textCenter: {
-    flex: 0.4,
-    justifyContent: 'center',
   },
   checkboxContainer: {
     flexDirection: 'row',
     marginBottom: 20,
   },
 });
+
+class LoadView extends React.Component {
+  render() {
+    return (
+      <View style={{ height: 1, align:'center' }}>
+        <DotIndicator size={20} color="#32a8a8" />
+      </View>
+    );
+  }
+}
 
 class Tasks extends React.Component {
   state = {
@@ -142,6 +145,8 @@ class Tasks extends React.Component {
       selectedValue: null,
       channelName: null,
       channelToken: null,
+      voicechat_tweet: null,
+      voicechat_answer: null,
     };
   }
 
@@ -152,12 +157,20 @@ class Tasks extends React.Component {
       }.bind(this),
       5000,
     );
+    setInterval(
+      function () {
+        if (this.state.myState === 0) {
+          this.getTweetFromQueue();
+        }
+      }.bind(this),
+      1000,
+    );
     this.readStore();
   }
 
   checkVoiceChat = async () => {
     await axios
-      .get(baseURL + '/check_voicechat/' + this.state.mail)
+      .get(BASE_URL + '/check_voicechat/' + this.state.mail)
       .then(response => {
         if (response.data == null) {
           console.log('no pending voice chat');
@@ -165,6 +178,8 @@ class Tasks extends React.Component {
           this.setState({
             channelName: response.data.name,
             channelToken: response.data.token,
+            voicechat_tweet: response.data.url,
+            voicechat_answer: response.data.answer,
           });
           console.log(
             'voice chat found, channelName: ' + this.state.channelName,
@@ -173,6 +188,8 @@ class Tasks extends React.Component {
           try {
             AsyncStorage.setItem('channelName', this.state.channelName);
             AsyncStorage.setItem('channelToken', this.state.channelToken);
+            AsyncStorage.setItem('voicechat_tweet', this.state.voicechat_tweet);
+            AsyncStorage.setItem('voicechat_answer', this.state.voicechat_answer);
           } catch (e) {}
         }
       });
@@ -181,11 +198,10 @@ class Tasks extends React.Component {
   getTweetFromQueue = async () => {
     this.setState({answers: []});
     await axios
-      .get(baseURL + '/get_tweet_to_answer/' + this.state.mail)
+      .get(BASE_URL + '/get_tweet_to_answer/' + this.state.mail)
       .then(response => {
         if (response.data == null) {
           this.setState({myState: 0});
-          alert('There is no task in the queue');
         } else {
           this.setState({
             tweet_id: response.data.tweet_id,
@@ -193,7 +209,7 @@ class Tasks extends React.Component {
           });
           axios
             .get(
-              baseURL +
+              BASE_URL +
                 '/get_tweet/' +
                 this.state.tweet_id +
                 '/' +
@@ -209,7 +225,7 @@ class Tasks extends React.Component {
             });
 
           axios
-            .get(baseURL + '/get_task/' + this.state.task_id)
+            .get(BASE_URL + '/get_task/' + this.state.task_id)
             .then(response => {
               if (response.data == null) {
                 this.setState({myState: 0});
@@ -250,12 +266,12 @@ class Tasks extends React.Component {
   answerQuestion = () => {
     const tempdate = new Date();
     axios
-      .post(baseURL + '/add_response', {
+      .post(BASE_URL + '/add_response', {
         tweet_id: this.state.tweet_id,
         task_id: this.state.task_id,
         mail: this.state.mail,
         answers: this.state.answers,
-        date: tempdate
+        date: tempdate,
       })
       .then(response => {
         if (response.data.message == 'failed') {
@@ -327,15 +343,15 @@ class Tasks extends React.Component {
   };
 
   render() {
-    if (this.state.myState == 0) {
+    if (this.state.myState === 0) {
       return (
         <View style={styles.container}>
-          <Text style={styles.textCenter}>Press the button to get task</Text>
-          <TouchableOpacity
-            style={styles.loginBtn}
-            onPress={this.getTweetFromQueue}>
-            <Text>Get Task</Text>
-          </TouchableOpacity>
+          <View style={styles.waitingContainer}>
+            <View>
+              <Text style={styles.waitingText}>Waiting for tasks...</Text>
+            </View>
+            <LoadView/>
+          </View>
         </View>
       );
     } else {
@@ -349,7 +365,7 @@ class Tasks extends React.Component {
           if (this.state.myState != this.state.metricNumbers) {
             return (
               <View style={styles.container}>
-                <View style={styles.bos} />
+
                 <View style={styles.container2}>
                   <WebView
                     source={{
@@ -466,7 +482,6 @@ class Tasks extends React.Component {
           if (this.state.myState != this.state.metricNumbers) {
             return (
               <View style={styles.container}>
-                <View style={styles.bos} />
                 <View style={styles.container2}>
                   <WebView
                     source={{
@@ -527,7 +542,6 @@ class Tasks extends React.Component {
           } else {
             return (
               <View style={styles.container}>
-                <View style={styles.bos} />
                 <View style={styles.container2}>
                   <WebView
                     source={{

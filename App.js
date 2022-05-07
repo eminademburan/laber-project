@@ -1,13 +1,4 @@
 import * as React from 'react';
-import {
-  Text,
-  View,
-  Button,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  SafeAreaView,
-} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -20,7 +11,7 @@ import SignUp from './components/SignUp.js';
 import Settings from './components/Settings.js';
 import Tasks from './components/Tasks.js';
 import VoiceChat from './components/VoiceChat.tsx';
-import axios from 'axios';
+import Register from "./components/Register";
 
 const Stack = createNativeStackNavigator();
 
@@ -28,6 +19,7 @@ const Tab = createBottomTabNavigator();
 
 function MyTabs(navigation) {
   return (
+
     <Tab.Navigator
       initialRouteName="Feed"
       screenOptions={{
@@ -53,21 +45,7 @@ function MyTabs(navigation) {
         options={{
           tabBarLabel: 'Tasks',
           tabBarIcon: ({color, size}) => (
-            <MaterialCommunityIcons name="store" color={color} size={size} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Settings"
-        component={Tasks}
-        options={{
-          tabBarLabel: 'Settings',
-          tabBarIcon: ({color, size}) => (
-            <MaterialCommunityIcons
-              name="account-settings-outline"
-              color={color}
-              size={size}
-            />
+            <MaterialCommunityIcons name="format-list-checkbox" color={color} size={size} />
           ),
         }}
       />
@@ -78,7 +56,7 @@ function MyTabs(navigation) {
           tabBarLabel: 'Voice Chat',
           tabBarIcon: ({color, size}) => (
             <MaterialCommunityIcons
-              name="account-settings-outline"
+              name="microphone"
               color={color}
               size={size}
             />
@@ -90,13 +68,16 @@ function MyTabs(navigation) {
 }
 
 export default class App extends React.Component {
+
   render() {
     return (
       <NavigationContainer>
         <Stack.Navigator screenOptions={{headerShown: false}}>
           <Stack.Screen name="Home" component={Home} />
           <Stack.Screen name="SignUp" component={SignUp} />
+          <Stack.Screen name="Register" component={Register} />
           <Stack.Screen name="MyTabs" component={MyTabs} />
+
         </Stack.Navigator>
       </NavigationContainer>
     );
