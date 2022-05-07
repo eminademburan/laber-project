@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Dimensions, StyleSheet, TouchableOpacity, View, Image } from "react-native";
 import { Text } from "react-native-paper";
 import Slider from "@react-native-community/slider";
 import { Picker } from "@react-native-picker/picker";
@@ -142,6 +142,7 @@ class Tasks extends React.Component {
       scalars: null,
       nonscalars: null,
       metricNumbers: 0,
+      task_type: 1,
       selectedValue: null,
       channelName: null,
       channelToken: null,
@@ -153,7 +154,7 @@ class Tasks extends React.Component {
   componentDidMount() {
     setInterval(
       function () {
-        this.checkVoiceChat();
+        //this.checkVoiceChat();
       }.bind(this),
       5000,
     );
@@ -342,6 +343,33 @@ class Tasks extends React.Component {
     return this.state.nonscalars;
   };
 
+  getDataView = () => {
+    if (this.state.task_type === 0) {
+      return <WebView
+        source={{
+          html:
+            '<blockquote class="twitter-tweet"> <a href="' +
+            this.state.tweetUrl +
+            '"></a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>',
+        }}
+        javaScriptEnabled={true}
+        style={{
+          flex: 1,
+          width: windowWidth * 1,
+        }}
+        scalesPageToFit={false}
+      />;
+    } else if (this.state.task_type === 1) {
+      return <Image
+        style={{
+          flex: 1,
+          width: windowWidth * 1,
+        }}
+        source={{uri:'https://engineering.fb.com/wp-content/uploads/2016/04/yearinreview.jpg'}}
+      />
+    }
+  };
+
   render() {
     if (this.state.myState === 0) {
       return (
@@ -367,20 +395,7 @@ class Tasks extends React.Component {
               <View style={styles.container}>
 
                 <View style={styles.container2}>
-                  <WebView
-                    source={{
-                      html:
-                        '<blockquote class="twitter-tweet"> <a href="' +
-                        this.state.tweetUrl +
-                        '"></a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>',
-                    }}
-                    javaScriptEnabled={true}
-                    style={{
-                      flex: 1,
-                      width: windowWidth * 1,
-                    }}
-                    scalesPageToFit={false}
-                  />
+                  <this.getDataView/>
                 </View>
                 <Text style={styles.TextInput}>
                   {this.state.nonscalars[this.state.myState - 1].name}.
@@ -419,20 +434,7 @@ class Tasks extends React.Component {
               <View style={styles.container}>
                 <View style={styles.bos} />
                 <View style={styles.container2}>
-                  <WebView
-                    source={{
-                      html:
-                        '<blockquote class="twitter-tweet"> <a href="' +
-                        this.state.tweetUrl +
-                        '"></a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>',
-                    }}
-                    javaScriptEnabled={true}
-                    style={{
-                      flex: 1,
-                      width: windowWidth * 1,
-                    }}
-                    scalesPageToFit={false}
-                  />
+                  <this.getDataView/>
                 </View>
                 <Text style={styles.TextInput}>
                   {this.state.nonscalars[this.state.myState - 1].name}.
@@ -483,20 +485,7 @@ class Tasks extends React.Component {
             return (
               <View style={styles.container}>
                 <View style={styles.container2}>
-                  <WebView
-                    source={{
-                      html:
-                        '<blockquote class="twitter-tweet"> <a href="' +
-                        this.state.tweetUrl +
-                        '"></a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>',
-                    }}
-                    javaScriptEnabled={true}
-                    style={{
-                      flex: 1,
-                      width: windowWidth * 1,
-                    }}
-                    scalesPageToFit={false}
-                  />
+                  <this.getDataView/>
                 </View>
 
                 <Text style={styles.TextInput}>
@@ -544,20 +533,7 @@ class Tasks extends React.Component {
             return (
               <View style={styles.container}>
                 <View style={styles.container2}>
-                  <WebView
-                    source={{
-                      html:
-                        '<blockquote class="twitter-tweet"> <a href="' +
-                        this.state.tweetUrl +
-                        '"></a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>',
-                    }}
-                    javaScriptEnabled={true}
-                    style={{
-                      flex: 1,
-                      width: windowWidth * 1,
-                    }}
-                    scalesPageToFit={false}
-                  />
+                  <this.getDataView/>
                 </View>
 
                 <Text style={styles.TextInput}>
