@@ -485,13 +485,12 @@ class Tasks extends React.Component {
                 </View>
 
                 <Text style={styles.TextInput}>
-                  Determine the{' '}
+
                   {
                     this.state.scalars[
-                      this.state.myState - this.state.nonscalars.length - 1
-                    ].name
-                  }{' '}
-                  of this tweet from {minValue} to {maxValue}
+                    this.state.myState - this.state.nonscalars.length - 1
+                        ].name
+                  }
                 </Text>
 
                 <View style={{flex: 0.2, flexDirection: 'row'}}>
@@ -547,13 +546,12 @@ class Tasks extends React.Component {
                 </View>
 
                 <Text style={styles.TextInput}>
-                  Determine the{' '}
+
                   {
                     this.state.scalars[
                       this.state.myState - this.state.nonscalars.length - 1
                     ].name
-                  }{' '}
-                  of this tweet from {minValue} to {maxValue}
+                  }
                 </Text>
 
                 <View style={{flex: 0.2, flexDirection: 'row'}}>
