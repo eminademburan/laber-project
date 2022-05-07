@@ -112,10 +112,7 @@ class SignUp extends React.Component {
   };
 
   handlePassword1 = text => {
-    alert(
-      '* The password must contain at least 1 lowercase alphabetical character \n* The password must contain at least 1 uppercase alphabetical character \n* The password must contain at least 1 numeric character' +
-        '\n* The password must contain at least one special character \n* The password must be eight characters or longer',
-    );
+
     this.setState({password: text});
   };
 
@@ -145,8 +142,7 @@ class SignUp extends React.Component {
     const surnameRegex = /[A-Z][a-zA-Z]*/;
     const phoneRegEx = /^\+[0-9]{2}[0-9]{10}$/;
     const ageRegEx = /^\d{1,2}$/;
-    const passwordRegEx =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/;
+    const passwordRegEx = /^(?=.\d)(?=.[a-z])(?=.[A-Z])(?=.[^a-zA-Z0-9])(?!.*\s).{8,15}$/;
     const linkRegEx = /[0-9][0-9][0-9][0-9][0-9][0-9]/;
 
     if (
@@ -155,7 +151,6 @@ class SignUp extends React.Component {
       surnameRegex.test(this.state.surname) &&
       phoneRegEx.test(this.state.phone) &&
       ageRegEx.test(this.state.age) &&
-      passwordRegEx.test(this.state.password) &&
       (linkRegEx.test(this.state.link) || this.state.link.length == 0)
     ) {
       return true;
@@ -173,9 +168,6 @@ class SignUp extends React.Component {
       return false;
     } else if (!ageRegEx.test(this.state.age)) {
       alert('Enter an appropriate age');
-      return false;
-    } else if (!passwordRegEx.test(this.state.password)) {
-      alert('Enter an appropriate password');
       return false;
     } else if (
       !linkRegEx.test(this.state.link) &&
@@ -198,7 +190,7 @@ class SignUp extends React.Component {
           phone: this.state.phone,
           age: this.state.age,
           region: this.state.region,
-          language: this.state.language,
+          language: this.state.region,
           password: this.state.password,
           link: this.state.link,
         })
