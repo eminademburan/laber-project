@@ -167,7 +167,7 @@ class Tasks extends React.Component {
           this.getTweetFromQueue();
         }
       }.bind(this),
-      10000,
+      500000000,
     );
 
     this.readStore();
@@ -283,7 +283,7 @@ class Tasks extends React.Component {
     if (response.data.message == 'failed') {
       this.setState({myState: 0});
     } else {
-      this.getTweetFromQueue();
+      await this.getTweetFromQueue();
     }
   };
 
@@ -294,7 +294,7 @@ class Tasks extends React.Component {
         this.readStore();
       } else if (value !== null) {
         this.setState({mail: value});
-        this.getTweetFromQueue()
+
       }
     } catch (e) {
       // error reading value
