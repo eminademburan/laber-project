@@ -127,6 +127,7 @@ class Tasks extends React.Component {
     nonscalars: null,
     metricNumbers: 0,
     selectedValue: null,
+    isCustom: null
   };
 
   constructor(props: Props) {
@@ -163,7 +164,7 @@ class Tasks extends React.Component {
           this.getTweetFromQueue();
         }
       }.bind(this),
-      1000,
+      10000000,
     );
     this.readStore();
   }
@@ -197,70 +198,74 @@ class Tasks extends React.Component {
 
   getTweetFromQueue = async () => {
     this.setState({answers: []});
-    await axios
-      .get(BASE_URL + '/get_tweet_to_answer/' + this.state.mail)
-      .then(response => {
-        if (response.data == null) {
-          this.setState({myState: 0});
-        } else {
-          this.setState({
-            tweet_id: response.data.tweet_id,
-            task_id: response.data.task_id,
-          });
-          axios
-            .get(
-              BASE_URL +
-                '/get_tweet/' +
-                this.state.tweet_id +
-                '/' +
-                this.state.task_id,
-            )
-            .then(response => {
-              if (response.data == null) {
-                this.setState({myState: 0});
-              } else {
-                const value = response.data.url;
-                this.setState({tweetUrl: value});
-              }
-            });
 
-          axios
-            .get(BASE_URL + '/get_task/' + this.state.task_id)
-            .then(response => {
-              if (response.data == null) {
-                this.setState({myState: 0});
-              } else {
-                const scalars = response.data.scalarMetrics.length;
-                const nonscalars = response.data.nonScalarMetrics.length;
+    let image = await axios.get('http://139.179.129.117:5000/get_tweet/17332724635/Custom Image Data');
+    alert(image.data);
 
-                if (nonscalars > 0) {
-                  let temp = this.state.answers;
-                  temp[0] = response.data.nonScalarMetrics[0].metricKeys[0];
-                  this.setState({
-                    myState: 1,
-                    answers: temp,
-                    selectedValue:
-                      response.data.nonScalarMetrics[0].metricKeys[0],
-                    metricNumbers: scalars + nonscalars,
-                    scalars: response.data.scalarMetrics,
-                    nonscalars: response.data.nonScalarMetrics,
-                  });
-                } else {
-                  let temp = this.state.answers;
-                  temp[0] = response.data.scalarMetrics[0].min;
-                  this.setState({
-                    myState: 1,
-                    answers: temp,
-                    selectedValue: response.data.scalarMetrics[0].min,
-                    metricNumbers: scalars + nonscalars,
-                    scalars: response.data.scalarMetrics,
-                    nonscalars: response.data.nonScalarMetrics,
-                  });
-                }
-              }
-            });
-        }
+
+
+
+    let response = await axios.get(BASE_URL + '/get_tweet_to_answer/' + this.state.mail);
+
+    if (response.data == null) {
+      this.setState({myState: 0});
+    }
+    else {
+      this.setState({
+        tweet_id: response.data.tweet_id,
+        task_id: response.data.task_id,
       });
+
+      let image = await axios.get(BASE_URL + '/get_tweet/' + this.state.tweet_id + '/' + this.state.task_id);
+
+      if (image.data == null) {
+        this.setState({myState: 0});
+      } else {
+        alert(image.data);
+        const value = image.data;
+        this.setState({tweetUrl: value});
+      }
+
+      axios
+          .get(BASE_URL + '/get_task/' + this.state.task_id)
+          .then(response => {
+            if (response.data == null) {
+              this.setState({myState: 0});
+            } else {
+              const scalars = response.data.scalarMetrics.length;
+              const nonscalars = response.data.nonScalarMetrics.length;
+
+              if (nonscalars > 0) {
+                let temp = this.state.answers;
+                temp[0] = response.data.nonScalarMetrics[0].metricKeys[0];
+                this.setState({
+                  myState: 1,
+                  answers: temp,
+                  selectedValue:
+                      response.data.nonScalarMetrics[0].metricKeys[0],
+                  metricNumbers: scalars + nonscalars,
+                  scalars: response.data.scalarMetrics,
+                  nonscalars: response.data.nonScalarMetrics,
+                });
+              } else {
+                let temp = this.state.answers;
+                temp[0] = response.data.scalarMetrics[0].min;
+                this.setState({
+                  myState: 1,
+                  answers: temp,
+                  selectedValue: response.data.scalarMetrics[0].min,
+                  metricNumbers: scalars + nonscalars,
+                  scalars: response.data.scalarMetrics,
+                  nonscalars: response.data.nonScalarMetrics,
+                });
+              }
+            }
+          });
+
+    }
+
+
+
   };
 
   answerQuestion = () => {
