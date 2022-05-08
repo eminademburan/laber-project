@@ -13,6 +13,7 @@ import { DotIndicator } from "react-native-indicators";
 const windowWidth = Dimensions.get('screen').width;
 const windowHeight = Dimensions.get('screen').height;
 
+
 const styles = StyleSheet.create({
   waitingContainer: {
     padding: 60,
@@ -142,7 +143,7 @@ class Tasks extends React.Component {
       scalars: null,
       nonscalars: null,
       metricNumbers: 0,
-      task_type: 1,
+      task_type: 0,
       selectedValue: null,
       channelName: null,
       channelToken: null,
@@ -329,9 +330,11 @@ class Tasks extends React.Component {
     }
   };
 
-  setAnswer = text => {
+  setAnswer = (text) => {
+    console.log("set answer called");
     let temp = this.state.answers;
     temp[this.state.myState - 1] = text;
+    alert(text);
     this.setState({answers: temp, selectedValue: text});
   };
 
@@ -506,7 +509,7 @@ class Tasks extends React.Component {
                     step={1}
                     minimumTrackTintColor="#FFFFFF"
                     maximumTrackTintColor="#000000"
-                    onValueChange={someValue => this.setAnswer(someValue)}
+                    onSlidingComplete={someValue => alert(someValue)}
                   />
                   <Text style={styles.title}>{maxValue}️</Text>
                 </View>
@@ -553,7 +556,7 @@ class Tasks extends React.Component {
                     step={1}
                     minimumTrackTintColor="#FFFFFF"
                     maximumTrackTintColor="#000000"
-                    onValueChange={someValue => this.setAnswer(someValue)}
+                    onSlidingComplete={someValue => alert(someValue)}
                   />
                   <Text style={styles.title}>{maxValue}️</Text>
                 </View>

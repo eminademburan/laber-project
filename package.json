@@ -17,6 +17,7 @@
     "@react-navigation/bottom-tabs": "^6.2.0",
     "@react-navigation/native": "^6.0.10",
     "@react-navigation/native-stack": "^6.5.0",
+    "aws-amplify": "^4.3.21",
     "axios": "^0.26.0",
     "json-bigint": "^1.0.0",
     "react": "17.0.2",

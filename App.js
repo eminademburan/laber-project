@@ -12,6 +12,7 @@ import Settings from './components/Settings.js';
 import Tasks from './components/Tasks.js';
 import VoiceChat from './components/VoiceChat.tsx';
 import Register from "./components/Register";
+import Test from "./components/Test.js";
 
 const Stack = createNativeStackNavigator();
 
@@ -54,6 +55,20 @@ function MyTabs(navigation) {
         component={VoiceChat}
         options={{
           tabBarLabel: 'Voice Chat',
+          tabBarIcon: ({color, size}) => (
+            <MaterialCommunityIcons
+              name="microphone"
+              color={color}
+              size={size}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Test"
+        component={Test}
+        options={{
+          tabBarLabel: 'Test',
           tabBarIcon: ({color, size}) => (
             <MaterialCommunityIcons
               name="microphone"
