@@ -331,10 +331,8 @@ class Tasks extends React.Component {
   };
 
   setAnswer = (text) => {
-    console.log("set answer called");
     let temp = this.state.answers;
     temp[this.state.myState - 1] = text;
-    alert(text);
     this.setState({answers: temp, selectedValue: text});
   };
 
@@ -509,7 +507,7 @@ class Tasks extends React.Component {
                     step={1}
                     minimumTrackTintColor="#FFFFFF"
                     maximumTrackTintColor="#000000"
-                    onSlidingComplete={someValue => alert(someValue)}
+                    onSlidingComplete={someValue => this.setAnswer(someValue)}
                   />
                   <Text style={styles.title}>{maxValue}️</Text>
                 </View>
@@ -556,7 +554,7 @@ class Tasks extends React.Component {
                     step={1}
                     minimumTrackTintColor="#FFFFFF"
                     maximumTrackTintColor="#000000"
-                    onSlidingComplete={someValue => alert(someValue)}
+                    onSlidingComplete={someValue => this.setAnswer(someValue)}
                   />
                   <Text style={styles.title}>{maxValue}️</Text>
                 </View>
