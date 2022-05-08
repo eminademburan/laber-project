@@ -155,21 +155,6 @@ class Tasks extends React.Component {
   }
 
   componentDidMount() {
-    setInterval(
-        function () {
-          //this.checkVoiceChat();
-        }.bind(this),
-        5000000,
-    );
-    setInterval(
-      function () {
-        if (this.state.myState == 0) {
-          this.getTweetFromQueue();
-        }
-      }.bind(this),
-      500000000,
-    );
-
     this.readStore();
   }
 
@@ -216,15 +201,22 @@ class Tasks extends React.Component {
       });
 
         console.log( this.state.task_id + "      " + this.state.tweet_id);
-        let image = await axios.get(BASE_URL + '/get_tweet/' + this.state.tweet_id + '/' + this.state.task_id);
+
+
+        let image = await axios.get(BASE_URL + '/get_tweet/' + this.state.tweet_id + '/' + this.state.task_id );
+
+
+
+
         console.log("a1");
 
 
       if (image.data == null) {
         this.setState({myState: 0});
       } else {
-        const value = image.data;
-        this.setState({tweetUrl: value});
+        console.log(image.data.url);
+        this.setState({tweetUrl: image.data.url});
+
 
         const result =  await axios.get(BASE_URL + '/get_task/' + this.state.task_id);
 
@@ -261,12 +253,7 @@ class Tasks extends React.Component {
           }
         }
       }
-
-
-
-
     }
-
 
   };
 
@@ -294,7 +281,7 @@ class Tasks extends React.Component {
         this.readStore();
       } else if (value !== null) {
         this.setState({mail: value});
-
+        await this.getTweetFromQueue()
       }
     } catch (e) {
       // error reading value
