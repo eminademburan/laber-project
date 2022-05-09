@@ -155,6 +155,21 @@ class Tasks extends React.Component {
   }
 
   componentDidMount() {
+    setInterval(
+        function () {
+          //this.checkVoiceChat();
+        }.bind(this),
+        5000,
+    );
+    setInterval(
+      function () {
+        if (this.state.myState === 0) {
+          this.getTweetFromQueue();
+        }
+      }.bind(this),
+      100000000,
+    );
+
     this.readStore();
   }
 
@@ -214,8 +229,8 @@ class Tasks extends React.Component {
       if (image.data == null) {
         this.setState({myState: 0});
       } else {
-        console.log(image.data.url);
-        this.setState({tweetUrl: image.data.url});
+
+        this.setState({tweetUrl: image.data});
 
 
         const result =  await axios.get(BASE_URL + '/get_task/' + this.state.task_id);
